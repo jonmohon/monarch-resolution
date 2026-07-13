@@ -5,14 +5,41 @@ import Eyebrow from "../ds/Eyebrow.jsx";
 import Input from "../ds/Input.jsx";
 import Select from "../ds/Select.jsx";
 
+// Lead endpoint: API Gateway -> Lambda (monarch-lead-handler, us-west-2).
+// Sends the internal notification + customer thank-you via SES and posts to Discord.
+const LEAD_ENDPOINT = "https://wucqsnrg8c.execute-api.us-west-2.amazonaws.com/";
+
 // Compact lead-capture form used in the hero and the consultation page.
-// TODO: wire the submit handler to a real endpoint (Zapier webhook / CRM)
-// before launch — currently it only shows the thank-you state.
 export default function LeadForm({ title = "Request Your Free Exit Analysis", compact = false }) {
-  const [dev, setDev] = useState("");
-  const [src, setSrc] = useState("");
-  const [c1, setC1] = useState(false);
+  const [fields, setFields] = useState({ name: "", phone: "", email: "", developer: "", fee: "", source: "" });
+  const [consent, setConsent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+
+  const set = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
+
+  async function submit(e) {
+    e.preventDefault();
+    setError("");
+    setSending(true);
+    try {
+      const res = await fetch(LEAD_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...fields, page: window.location.href }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Something went wrong.");
+      }
+      setSent(true);
+    } catch (err) {
+      setError(err.message === "Failed to fetch" ? "Network error — please try again or call (888) 895-4009." : err.message);
+    } finally {
+      setSending(false);
+    }
+  }
 
   if (sent) {
     return (
@@ -34,17 +61,16 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
           </svg>
         </div>
         <h3 style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-strong)", margin: "0 0 8px" }}>Thank you.</h3>
-        <p style={{ margin: 0, color: "var(--text-body)" }}>An exit advisor will reach out within one business day to explain your realistic options.</p>
+        <p style={{ margin: 0, color: "var(--text-body)" }}>
+          An exit advisor will reach out within one business day to explain your realistic options. A confirmation email is on its way to you now.
+        </p>
       </div>
     );
   }
 
   return (
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setSent(true);
-      }}
+      onSubmit={submit}
       style={{
         background: "var(--surface-card)",
         borderRadius: "var(--radius-lg)",
@@ -60,38 +86,53 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
         <h3 style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-strong)", margin: "8px 0 0", lineHeight: 1.15 }}>{title}</h3>
       </div>
       <div className="form-row">
-        <Input label="Name" placeholder="Full name" required />
-        <Input label="Phone #" type="tel" placeholder="(555) 000-0000" required />
+        <Input label="Name" placeholder="Full name" required value={fields.name} onChange={set("name")} />
+        <Input label="Phone #" type="tel" placeholder="(555) 000-0000" required value={fields.phone} onChange={set("phone")} />
       </div>
-      <Input label="Email" type="email" placeholder="you@email.com" required />
+      <Input label="Email" type="email" placeholder="you@email.com" required value={fields.email} onChange={set("email")} />
       <div className="form-row">
         <Select
           label="Timeshare Developer"
           required
           options={["Wyndham", "Hilton Grand Vacations", "Marriott Vacation Club", "Diamond Resorts", "Bluegreen", "Westgate", "Other"]}
-          value={dev}
-          onChange={(e) => setDev(e.target.value)}
+          value={fields.developer}
+          onChange={set("developer")}
         />
-        <Input label="Maintenance Fee" placeholder="$ / year" required />
+        <Input label="Maintenance Fee" placeholder="$ / year" required value={fields.fee} onChange={set("fee")} />
       </div>
       <Select
         label="How did you hear about us"
         required
         options={["Google", "YouTube", "Facebook", "X", "Television", "Friend", "Other"]}
-        value={src}
-        onChange={(e) => setSrc(e.target.value)}
+        value={fields.source}
+        onChange={set("source")}
       />
       <Checkbox
-        checked={c1}
-        onChange={(e) => setC1(e.target.checked)}
+        checked={consent}
+        onChange={(e) => setConsent(e.target.checked)}
+        required
         label={
           <>
             I accept the <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a>, and consent to be contacted about my inquiry.
           </>
         }
       />
-      <Button type="submit" variant="primary" size="lg" fullWidth>
-        Request Free Analysis
+      {error && (
+        <div
+          style={{
+            background: "#fdf0ef",
+            border: "1px solid var(--danger-500)",
+            borderRadius: "var(--radius-sm)",
+            padding: "10px 14px",
+            fontSize: 14,
+            color: "var(--danger-500)",
+          }}
+        >
+          {error}
+        </div>
+      )}
+      <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}>
+        {sending ? "Sending…" : "Request Free Analysis"}
       </Button>
     </form>
   );
