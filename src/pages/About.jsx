@@ -8,8 +8,8 @@ import ScheduleBand from "../components/ScheduleBand.jsx";
 import { Section, SectionHead } from "../components/Section.jsx";
 import aboutHero from "../assets/about-hero.jpg";
 import commitment from "../assets/commitment.jpg";
-// Owner portrait: drop the photo at src/assets/owner.jpg and set OWNER_PHOTO to it.
-const OWNER_PHOTO = null;
+import lukePhoto from "../assets/luke.jpeg";
+const OWNER_PHOTO = lukePhoto;
 
 function OwnerPortrait() {
   return (
@@ -25,7 +25,7 @@ function OwnerPortrait() {
       }}
     >
       {OWNER_PHOTO ? (
-        <ParallaxImage src={OWNER_PHOTO} strength={70} />
+        <ParallaxImage src={OWNER_PHOTO} strength={50} biasY={-14} />
       ) : (
         <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
           <div style={{ textAlign: "center" }}>
@@ -69,7 +69,7 @@ function OwnerPortrait() {
           background: "linear-gradient(180deg, rgba(5,16,31,0) 0%, rgba(5,16,31,0.85) 100%)",
         }}
       >
-        <div style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "#fff", fontWeight: 600 }}>Your advocate, start to finish</div>
+        <div style={{ fontFamily: "var(--font-display)", fontSize: 24, color: "#fff", fontWeight: 600 }}>Luke King</div>
         <div style={{ fontFamily: "var(--font-label)", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--teal-400)", marginTop: 4 }}>
           Founder &amp; Owner · Monarch Resolution
         </div>
@@ -94,16 +94,16 @@ function FounderStory() {
               lineHeight: 1.1,
             }}
           >
-            When you call, you talk to the owner. Every time.
+            When you call, you talk to Luke King. Every time.
           </h2>
           <p style={{ fontSize: 18, lineHeight: 1.65, color: "var(--text-body)", margin: "0 0 16px" }}>
             Most timeshare exit companies are built like call centers: commissioned salespeople answer the phone, your case gets passed between
             departments, and nobody along the way is accountable for the outcome. Monarch Resolution was founded to be the opposite of that.
           </p>
           <p style={{ fontSize: 18, lineHeight: 1.65, color: "var(--text-body)", margin: "0 0 16px" }}>
-            Here, every consultation is taken personally by the owner. The person who listens to your situation on the first call is the same
-            person who reviews your contract, builds your exit strategy, and sees your case through to resolution. No hand-offs, no scripts, no
-            sales quotas — just one experienced advocate who knows your file inside and out.
+            Here, every consultation is taken personally by Luke King, Monarch Resolution's founder and owner. The person who listens to your
+            situation on the first call is the same person who reviews your contract, builds your exit strategy, and sees your case through to
+            resolution. No hand-offs, no scripts, no sales quotas — just one experienced advocate who knows your file inside and out.
           </p>
           <p
             style={{
@@ -119,6 +119,9 @@ function FounderStory() {
           >
             "I built this company small on purpose. If I take your case, it's because I genuinely believe I can get you out — and I'll be the one
             working it."
+            <span style={{ display: "block", marginTop: 10, fontStyle: "normal", fontFamily: "var(--font-label)", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>
+              — Luke King, Founder &amp; Owner
+            </span>
           </p>
         </Reveal>
         <Reveal delay={140}>
@@ -130,7 +133,7 @@ function FounderStory() {
 }
 
 const COMPARISON = [
-  ["A commissioned sales rep answers your call", "The owner personally takes every consultation"],
+  ["A commissioned sales rep answers your call", "Luke personally takes every consultation"],
   ["Your case is passed between departments", "One point of contact from first call to resolution"],
   ["Every caller is a sale to be closed", "Cases are accepted only when there's a credible path out"],
   ["Scripted pitches and pressure tactics", "Straight answers about your realistic options"],
