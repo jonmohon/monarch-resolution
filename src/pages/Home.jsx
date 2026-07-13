@@ -3,7 +3,6 @@ import Accordion from "../ds/Accordion.jsx";
 import Button from "../ds/Button.jsx";
 import Eyebrow from "../ds/Eyebrow.jsx";
 import ServiceCard from "../ds/ServiceCard.jsx";
-import Stat from "../ds/Stat.jsx";
 import CoverImage from "../components/CoverImage.jsx";
 import { Section, SectionHead } from "../components/Section.jsx";
 import { CheckIcon, LifebuoyIcon, PhoneIcon, RouteIcon, SealIcon } from "../components/icons.jsx";
@@ -67,11 +66,6 @@ function Hero() {
             <Button variant="outline-light" size="lg" onClick={() => navigate("/process")}>
               See the Process
             </Button>
-          </div>
-          <div style={{ display: "flex", gap: 28, marginTop: 40, flexWrap: "wrap" }}>
-            <Stat onDark value="10,000+" label="Owners helped" />
-            <Stat onDark value="$100M+" label="In financial relief" accent="teal" />
-            <Stat onDark value="30+" label="Years of experience" />
           </div>
         </div>
         <LeadForm compact title="Request Your Free Exit Analysis" />
@@ -277,26 +271,6 @@ function WhoWeHelp() {
   );
 }
 
-function AboutStats() {
-  return (
-    <Section dark>
-      <div style={{ maxWidth: 820 }}>
-        <SectionHead
-          onDark
-          eyebrow="About Monarch"
-          title="Experience isn't a claim — it's the reason clients trust us"
-          intro="Our founders bring more than 30 years of leadership experience within the timeshare exit industry, having helped over 10,000 owners break free from unwanted obligations and achieve more than $100 million in financial relief."
-        />
-      </div>
-      <div className="grid-3" style={{ marginTop: 20, borderTop: "1px solid var(--border-on-dark)", paddingTop: 44 }}>
-        <Stat onDark value="30+" label="Years of leadership experience" />
-        <Stat onDark value="10,000+" label="Owners helped to freedom" accent="teal" />
-        <Stat onDark value="$100M+" label="In financial relief secured" />
-      </div>
-    </Section>
-  );
-}
-
 function FAQ() {
   return (
     <Section>
@@ -354,7 +328,6 @@ export default function HomePage() {
       <Services />
       <Process />
       <WhoWeHelp />
-      <AboutStats />
       <FAQ />
       <FinalCTA />
     </div>
