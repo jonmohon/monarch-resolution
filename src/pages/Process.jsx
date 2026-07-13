@@ -8,7 +8,7 @@ const TITLE_STEPS = [
   {
     n: 1,
     t: "Initial Consultation & Analysis",
-    d: "Your journey begins with a call with a friendly exit advisor. We gather essential information about your contract and assess whether your case can lead to a successful resolution. Each situation is unique, so your advisor crafts a customized exit strategy tailored to your circumstances.",
+    d: "Your journey begins with a call with a friendly exit advisor. We gather essential information about your contract and assess whether your file can lead to a successful resolution. Each situation is unique, so your advisor crafts a customized exit strategy tailored to your circumstances.",
   },
   {
     n: 2,

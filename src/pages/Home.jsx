@@ -118,7 +118,7 @@ const THREE_UP = [
   },
   {
     t: "Who We Serve",
-    d: "We focus on owners experiencing financial strain or health-related challenges, taking on cases where we have high confidence in a successful resolution.",
+    d: "We focus on owners experiencing financial strain or health-related challenges, taking on files where we have high confidence in a successful resolution.",
   },
   {
     t: "Start Your Journey",

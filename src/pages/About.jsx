@@ -94,16 +94,16 @@ function FounderStory() {
               lineHeight: 1.1,
             }}
           >
-            Your case is handled personally by Luke King.
+            Your file is handled personally by Luke King.
           </h2>
           <p style={{ fontSize: 18, lineHeight: 1.65, color: "var(--text-body)", margin: "0 0 16px" }}>
-            Most timeshare exit companies are built like call centers: commissioned salespeople work the phones, your case gets passed between
+            Most timeshare exit companies are built like call centers: commissioned salespeople work the phones, your file gets passed between
             departments, and nobody along the way is accountable for the outcome. Monarch Resolution was founded to be the opposite of that.
           </p>
           <p style={{ fontSize: 18, lineHeight: 1.65, color: "var(--text-body)", margin: "0 0 16px" }}>
             Here, our team simply sets your appointment — and from there, you're working with Luke King, Monarch Resolution's founder and owner.
             Your consultation is with Luke himself, and the person who assesses your situation is the same person who reviews your contract,
-            builds your exit strategy, and sees your case through to resolution. No hand-offs, no scripts, no sales quotas — one experienced
+            builds your exit strategy, and sees your file through to resolution. No hand-offs, no scripts, no sales quotas — one experienced
             advocate who knows your file inside and out.
           </p>
           <p
@@ -118,8 +118,8 @@ function FounderStory() {
               margin: "26px 0 0",
             }}
           >
-            "I built this company small on purpose. If I take your case, it's because I genuinely believe I can get you out — and I'll be the one
-            working it."
+            "This industry burned a lot of people before I ever got here. The only way I know to fix that is simple: tell owners the truth, take
+            the files we can win, and get the job done."
             <span style={{ display: "block", marginTop: 10, fontStyle: "normal", fontFamily: "var(--font-label)", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>
               — Luke King, Founder &amp; Owner
             </span>
@@ -135,8 +135,8 @@ function FounderStory() {
 
 const COMPARISON = [
   ["A commissioned sales rep runs your consultation", "Your consultation is with Luke — the owner, not a rep"],
-  ["Your case is passed between departments", "The same advocate works your case from consultation to resolution"],
-  ["Every caller is a sale to be closed", "Cases are accepted only when there's a credible path out"],
+  ["Your file is passed between departments", "The same advocate works your file from consultation to resolution"],
+  ["Every caller is a sale to be closed", "Files are accepted only when there's a credible path out"],
   ["Scripted pitches and pressure tactics", "Straight answers about your realistic options"],
   ["A black-box process you can't see into", "You know exactly what's happening at every step"],
 ];
@@ -233,12 +233,12 @@ const PROMISES = [
     d: "Your consultation is a real conversation with the owner, not a pitch. If an exit doesn't make sense for your situation, you'll hear that too — for free.",
   },
   {
-    t: "Selective case acceptance",
-    d: "We don't take every case. If we move forward together, it's because we see a credible, legitimate path out of your contract.",
+    t: "Selective file acceptance",
+    d: "We don't take every file. If we move forward together, it's because we see a credible, legitimate path out of your contract.",
   },
   {
     t: "One advocate, always reachable",
-    d: "You'll never have to re-explain your situation to a stranger. The person who handled your consultation is the person working your case.",
+    d: "You'll never have to re-explain your situation to a stranger. The person who handled your consultation is the person working your file.",
   },
   {
     t: "No false promises",
@@ -261,7 +261,7 @@ function OurPromise() {
         <div>
           <SectionHead
             eyebrow="Our Promise To You"
-            title="Boutique service means you're never a case number"
+            title="Boutique service means you're never a file number"
             intro="Every timeshare situation is unique — and personal. This is what you can hold us to, from the first phone call to the day you're free."
           />
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
@@ -315,10 +315,10 @@ function ValuesBand() {
             lineHeight: 1.1,
           }}
         >
-          Talk directly with the person who will handle your case
+          Talk directly with the person who will handle your file
         </h2>
         <p style={{ maxWidth: "58ch", margin: "0 auto 30px", fontSize: 19, lineHeight: 1.6, color: "rgba(255,255,255,0.85)" }}>
-          One free consultation. An honest read on your situation. And if we take your case, the undivided attention of the owner — not a queue
+          One free consultation. An honest read on your situation. And if we take your file, the undivided attention of the owner — not a queue
           at a call center.
         </p>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -340,7 +340,7 @@ export default function AboutPage() {
       <PageHero
         eyebrow="About Us"
         title="Boutique Service. Direct Access. Real Advocacy."
-        intro="Monarch Resolution is a founder-led firm built on a simple idea: timeshare owners deserve to work with the person actually handling their case — not a sales floor."
+        intro="Monarch Resolution is a founder-led firm built on a simple idea: timeshare owners deserve to work with the person actually handling their file — not a sales floor."
         biasY={10}
         img={aboutHero}
       />
