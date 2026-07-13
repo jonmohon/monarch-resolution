@@ -1,5 +1,4 @@
 import Eyebrow from "../ds/Eyebrow.jsx";
-import Stat from "../ds/Stat.jsx";
 import CoverImage from "../components/CoverImage.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ScheduleBand from "../components/ScheduleBand.jsx";
@@ -45,13 +44,6 @@ export default function AboutPage() {
           <div style={{ borderRadius: "var(--radius-lg)", overflow: "hidden", height: 440, boxShadow: "var(--shadow-lg)" }}>
             <CoverImage src={commitment} />
           </div>
-        </div>
-      </Section>
-      <Section dark>
-        <div className="grid-3">
-          <Stat onDark value="30+" label="Years of leadership experience" />
-          <Stat onDark value="10,000+" label="Owners helped to freedom" accent="teal" />
-          <Stat onDark value="$100M+" label="In financial relief secured" />
         </div>
       </Section>
       <ScheduleBand />
