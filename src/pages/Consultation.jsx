@@ -1,5 +1,4 @@
 import Eyebrow from "../ds/Eyebrow.jsx";
-import Stat from "../ds/Stat.jsx";
 import { CheckIcon } from "../components/icons.jsx";
 import LeadForm from "../site/LeadForm.jsx";
 
@@ -58,10 +57,6 @@ export default function ConsultationPage() {
                   </div>
                 </div>
               ))}
-            </div>
-            <div style={{ marginTop: 40, paddingTop: 26, borderTop: "1px solid var(--border-on-dark)", display: "flex", gap: 34 }}>
-              <Stat onDark value="10,000+" label="Owners helped" />
-              <Stat onDark value="$100M+" label="In relief" accent="teal" />
             </div>
           </div>
           <LeadForm title="Request Your Free Exit Analysis" />
