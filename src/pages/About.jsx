@@ -19,13 +19,13 @@ function OwnerPortrait() {
         position: "relative",
         borderRadius: "var(--radius-lg)",
         overflow: "hidden",
-        height: 520,
+        aspectRatio: "1 / 1",
         boxShadow: "var(--shadow-xl)",
         background: "linear-gradient(160deg, var(--navy-800), var(--navy-950))",
       }}
     >
       {OWNER_PHOTO ? (
-        <ParallaxImage src={OWNER_PHOTO} strength={50} biasY={-14} />
+        <img src={OWNER_PHOTO} alt="Luke King, Founder & Owner of Monarch Resolution" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
       ) : (
         <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
           <div style={{ textAlign: "center" }}>
@@ -94,16 +94,17 @@ function FounderStory() {
               lineHeight: 1.1,
             }}
           >
-            When you call, you talk to Luke King. Every time.
+            Your case is handled personally by Luke King.
           </h2>
           <p style={{ fontSize: 18, lineHeight: 1.65, color: "var(--text-body)", margin: "0 0 16px" }}>
-            Most timeshare exit companies are built like call centers: commissioned salespeople answer the phone, your case gets passed between
+            Most timeshare exit companies are built like call centers: commissioned salespeople work the phones, your case gets passed between
             departments, and nobody along the way is accountable for the outcome. Monarch Resolution was founded to be the opposite of that.
           </p>
           <p style={{ fontSize: 18, lineHeight: 1.65, color: "var(--text-body)", margin: "0 0 16px" }}>
-            Here, every consultation is taken personally by Luke King, Monarch Resolution's founder and owner. The person who listens to your
-            situation on the first call is the same person who reviews your contract, builds your exit strategy, and sees your case through to
-            resolution. No hand-offs, no scripts, no sales quotas — just one experienced advocate who knows your file inside and out.
+            Here, our team simply sets your appointment — and from there, you're working with Luke King, Monarch Resolution's founder and owner.
+            Your consultation is with Luke himself, and the person who assesses your situation is the same person who reviews your contract,
+            builds your exit strategy, and sees your case through to resolution. No hand-offs, no scripts, no sales quotas — one experienced
+            advocate who knows your file inside and out.
           </p>
           <p
             style={{
@@ -133,8 +134,8 @@ function FounderStory() {
 }
 
 const COMPARISON = [
-  ["A commissioned sales rep answers your call", "Luke personally takes every consultation"],
-  ["Your case is passed between departments", "One point of contact from first call to resolution"],
+  ["A commissioned sales rep runs your consultation", "Your consultation is with Luke — the owner, not a rep"],
+  ["Your case is passed between departments", "The same advocate works your case from consultation to resolution"],
   ["Every caller is a sale to be closed", "Cases are accepted only when there's a credible path out"],
   ["Scripted pitches and pressure tactics", "Straight answers about your realistic options"],
   ["A black-box process you can't see into", "You know exactly what's happening at every step"],
@@ -228,8 +229,8 @@ function BoutiqueDifference() {
 
 const PROMISES = [
   {
-    t: "An honest first call",
-    d: "Your consultation is a real conversation, not a pitch. If an exit doesn't make sense for your situation, you'll hear that too — for free.",
+    t: "An honest consultation",
+    d: "Your consultation is a real conversation with the owner, not a pitch. If an exit doesn't make sense for your situation, you'll hear that too — for free.",
   },
   {
     t: "Selective case acceptance",
@@ -237,7 +238,7 @@ const PROMISES = [
   },
   {
     t: "One advocate, always reachable",
-    d: "You'll never have to re-explain your situation to a stranger. The person who took your first call is the person working your case.",
+    d: "You'll never have to re-explain your situation to a stranger. The person who handled your consultation is the person working your case.",
   },
   {
     t: "No false promises",
@@ -317,8 +318,8 @@ function ValuesBand() {
           Talk directly with the person who will handle your case
         </h2>
         <p style={{ maxWidth: "58ch", margin: "0 auto 30px", fontSize: 19, lineHeight: 1.6, color: "rgba(255,255,255,0.85)" }}>
-          One free call. An honest read on your situation. And if we take your case, the undivided attention of the owner — not a queue at a call
-          center.
+          One free consultation. An honest read on your situation. And if we take your case, the undivided attention of the owner — not a queue
+          at a call center.
         </p>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <Button variant="primary" size="lg" onClick={() => navigate("/consultation")}>
