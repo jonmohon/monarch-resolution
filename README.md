@@ -24,6 +24,6 @@ npm run dev
 
 - **Lead form is not wired to a backend yet** — it shows the thank-you state client-side.
   Hook `src/site/LeadForm.jsx` to a webhook/CRM before running traffic to it.
-- Deployed under `/monarch-resolution-site/` (see `vite.config.js`). For a custom
+- Deployed under `/monarch-resolution/` (see `vite.config.js`). For a custom
   domain, build with `VITE_BASE=/` and add a CNAME.
 - Design tokens live in `src/styles/tokens.css`; responsive layout rules in `src/styles/site.css`.
