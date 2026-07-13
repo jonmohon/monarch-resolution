@@ -1,0 +1,209 @@
+/* ============================================================
+   Monarch Resolution — Design tokens (from Claude Design handoff)
+   Deep-navy authority, teal signal, brass/gold prestige.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  /* --- Brand navy scale --- */
+  --navy-950: #05101f;
+  --navy-900: #071627;
+  --navy-800: #0a2036;
+  --navy-700: #0e2c49;
+  --navy-600: #133a5e;
+  --navy-500: #1b4c78;
+  --navy-400: #2e6699;
+  --navy-300: #5a89b5;
+
+  /* --- Accent (cerulean-blue) --- */
+  --teal-600: #0d6cb0;
+  --teal-500: #1184d6;
+  --teal-400: #40a3e6;
+  --teal-100: #d6eafa;
+
+  /* --- Brass / gold --- */
+  --gold-700: #9c7c3c;
+  --gold-500: #c6a15b;
+  --gold-400: #d8bb7e;
+  --gold-100: #f3e9d3;
+
+  /* --- Neutrals --- */
+  --neutral-0:   #ffffff;
+  --neutral-50:  #f5f7fa;
+  --neutral-100: #eaeef3;
+  --neutral-200: #d8dee7;
+  --neutral-300: #b9c3d0;
+  --neutral-400: #8a97a8;
+  --neutral-500: #64748b;
+  --neutral-600: #47566a;
+  --neutral-700: #33404f;
+  --neutral-800: #1e2836;
+  --neutral-900: #101923;
+
+  /* --- Semantic status --- */
+  --success-500: #2f9e6b;
+  --warning-500: #c99a2e;
+  --danger-500:  #c0453c;
+
+  /* Brand aliases */
+  --brand:            var(--navy-700);
+  --brand-strong:     var(--navy-900);
+  --brand-accent:     var(--teal-500);
+  --brand-accent-ink: var(--teal-600);
+  --brand-prestige:   var(--gold-500);
+
+  /* Surfaces */
+  --surface-page:     var(--neutral-50);
+  --surface-card:     var(--neutral-0);
+  --surface-sunken:   var(--neutral-100);
+  --surface-inverse:  var(--navy-900);
+  --surface-inverse-2:var(--navy-800);
+
+  /* Text */
+  --text-strong:   var(--neutral-900);
+  --text-body:     var(--neutral-700);
+  --text-muted:    var(--neutral-500);
+  --text-on-dark:  var(--neutral-50);
+  --text-on-dark-muted: var(--neutral-300);
+  --text-accent:   var(--teal-600);
+  --text-link:     var(--teal-600);
+
+  /* Lines / borders */
+  --border-subtle: var(--neutral-200);
+  --border-strong: var(--neutral-300);
+  --border-on-dark: rgba(255,255,255,0.14);
+  --hairline-accent: var(--teal-500);
+
+  /* Interactive fills */
+  --fill-primary:        var(--teal-500);
+  --fill-primary-hover:  var(--teal-600);
+  --fill-secondary:      var(--navy-700);
+  --fill-secondary-hover:var(--navy-800);
+  --focus-ring:          rgba(17,132,214,0.42);
+
+  /* Elevation — cool navy-tinted shadows */
+  --shadow-sm:  0 1px 2px rgba(7,22,39,0.08);
+  --shadow-md:  0 6px 20px rgba(7,22,39,0.10);
+  --shadow-lg:  0 18px 44px rgba(7,22,39,0.14);
+  --shadow-xl:  0 32px 70px rgba(7,22,39,0.22);
+  --shadow-accent: 0 10px 28px rgba(17,132,214,0.32);
+
+  /* Overlays / scrims */
+  --scrim-hero: linear-gradient(180deg, rgba(5,16,31,0.55) 0%, rgba(5,16,31,0.35) 40%, rgba(5,16,31,0.78) 100%);
+  --scrim-soft: linear-gradient(180deg, rgba(5,16,31,0.0) 0%, rgba(5,16,31,0.6) 100%);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+
+  /* Focus */
+  --focus-width: 3px;
+
+  /* Spacing — 4px base grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* Section rhythm */
+  --section-y: clamp(64px, 9vw, 128px);
+  --container: 1200px;
+  --container-narrow: 760px;
+  --gutter: clamp(20px, 5vw, 64px);
+
+  /* Corner radii */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Control heights */
+  --control-h: 52px;
+  --control-h-sm: 42px;
+
+  /* Typography */
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-label:   "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --font-body:    "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+
+  --fs-display-1: clamp(3rem, 6vw, 5.25rem);
+  --fs-display-2: clamp(2.25rem, 4vw, 3.5rem);
+  --fs-display-3: clamp(1.75rem, 2.6vw, 2.5rem);
+
+  --fs-h4:   1.5rem;
+  --fs-h5:   1.25rem;
+  --fs-lead: 1.1875rem;
+  --fs-body: 1.0625rem;
+  --fs-sm:   0.9375rem;
+  --fs-xs:   0.8125rem;
+  --fs-eyebrow: 0.8125rem;
+
+  --fw-reg: 400;
+  --fw-med: 500;
+  --fw-semi: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.08;
+  --lh-snug:  1.25;
+  --lh-body:  1.62;
+
+  --track-eyebrow: 0.22em;
+  --track-label:   0.06em;
+  --track-tight:   -0.01em;
+}
+
+/* ============================================================
+   Base element defaults & link styling
+   ============================================================ */
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--text-body);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--text-strong);
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-med);
+  letter-spacing: var(--track-tight);
+  text-wrap: balance;
+  margin: 0;
+}
+
+p { text-wrap: pretty; }
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+a:hover { color: var(--brand-accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+
+::selection { background: var(--teal-100); color: var(--navy-900); }
+
+:focus-visible {
+  outline: var(--focus-width) solid var(--focus-ring);
+  outline-offset: 2px;
+}
