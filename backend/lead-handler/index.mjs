@@ -226,7 +226,12 @@ export const handler = async (event) => {
     body: JSON.stringify(body),
   });
 
-  if (event.requestContext?.http?.method !== "POST") {
+  const method = event.requestContext?.http?.method;
+  // API Gateway appends the configured CORS headers; a 204 here completes the preflight.
+  if (method === "OPTIONS") {
+    return { statusCode: 204 };
+  }
+  if (method !== "POST") {
     return respond(405, { error: "Method not allowed" });
   }
 
