@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../ds/Button.jsx";
 import Eyebrow from "../ds/Eyebrow.jsx";
+import { Reveal } from "./motion.jsx";
 
 export default function ScheduleBand() {
   const navigate = useNavigate();
   return (
     <section style={{ background: "var(--surface-inverse)", padding: "var(--section-y) 0" }}>
-      <div className="container" style={{ textAlign: "center" }}>
+      <Reveal className="container" style={{ textAlign: "center" }}>
         <Eyebrow onDark align="center">
           Schedule Your Consultation
         </Eyebrow>
@@ -34,7 +35,7 @@ export default function ScheduleBand() {
             (888) 895-4009
           </Button>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { Reveal } from "../components/motion.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ScheduleBand from "../components/ScheduleBand.jsx";
 import { Section, SectionHead } from "../components/Section.jsx";
@@ -39,8 +40,9 @@ export default function ProcessPage() {
           intro="While our services come with a fee and we can't guarantee specific outcomes, our process gives every client a clear, supported route forward."
         />
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {TITLE_STEPS.map((s) => (
-            <div key={s.n} className="step-card">
+          {TITLE_STEPS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 120}>
+            <div className="step-card">
               <div style={{ fontFamily: "var(--font-display)", fontSize: 64, fontWeight: 600, color: "var(--brand-prestige)", lineHeight: 0.9, minWidth: 78 }}>
                 {String(s.n).padStart(2, "0")}
               </div>
@@ -51,6 +53,7 @@ export default function ProcessPage() {
                 <p style={{ margin: 0, fontSize: 17, lineHeight: 1.62, color: "var(--text-body)", maxWidth: "72ch" }}>{s.d}</p>
               </div>
             </div>
+            </Reveal>
           ))}
         </div>
       </Section>

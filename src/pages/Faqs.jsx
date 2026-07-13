@@ -1,4 +1,5 @@
 import Accordion from "../ds/Accordion.jsx";
+import { Reveal } from "../components/motion.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ScheduleBand from "../components/ScheduleBand.jsx";
 import { Section } from "../components/Section.jsx";
@@ -16,9 +17,9 @@ export default function FaqsPage() {
         img={whoWeHelp}
       />
       <Section>
-        <div style={{ maxWidth: 860, margin: "0 auto" }}>
+        <Reveal style={{ maxWidth: 860, margin: "0 auto" }}>
           <Accordion items={FAQS} />
-        </div>
+        </Reveal>
       </Section>
       <ScheduleBand />
     </div>

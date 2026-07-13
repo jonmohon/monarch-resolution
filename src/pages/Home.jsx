@@ -3,7 +3,7 @@ import Accordion from "../ds/Accordion.jsx";
 import Button from "../ds/Button.jsx";
 import Eyebrow from "../ds/Eyebrow.jsx";
 import ServiceCard from "../ds/ServiceCard.jsx";
-import CoverImage from "../components/CoverImage.jsx";
+import { ParallaxImage, Reveal } from "../components/motion.jsx";
 import { Section, SectionHead } from "../components/Section.jsx";
 import { CheckIcon, LifebuoyIcon, PhoneIcon, RouteIcon, SealIcon } from "../components/icons.jsx";
 import LeadForm from "../site/LeadForm.jsx";
@@ -18,7 +18,7 @@ function Hero() {
   return (
     <section style={{ position: "relative", background: "var(--navy-900)", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0 }}>
-        <CoverImage src={heroImg} biasY={0} />
+        <ParallaxImage src={heroImg} biasY={0} strength={180} imgStyle={{ scale: "1.08" }} />
         <div
           style={{
             position: "absolute",
@@ -30,10 +30,13 @@ function Hero() {
       </div>
       <div className="container hero-grid" style={{ position: "relative", zIndex: 2, padding: "96px var(--gutter)" }}>
         <div>
-          <Eyebrow onDark withRule>
-            Timeshare Exit Experts
-          </Eyebrow>
+          <div className="hero-rise">
+            <Eyebrow onDark withRule>
+              Timeshare Exit Experts
+            </Eyebrow>
+          </div>
           <h1
+            className="hero-rise hero-rise-1"
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 500,
@@ -47,6 +50,7 @@ function Hero() {
             Get Out of an Unwanted Timeshare — For Good
           </h1>
           <p
+            className="hero-rise hero-rise-2"
             style={{
               marginTop: 22,
               maxWidth: "52ch",
@@ -59,7 +63,7 @@ function Hero() {
             If your timeshare no longer fits your life or finances, Monarch Resolution helps you cancel and exit your contract so you can move
             forward with confidence and peace of mind.
           </p>
-          <div style={{ display: "flex", gap: 14, marginTop: 30, flexWrap: "wrap" }}>
+          <div className="hero-rise hero-rise-3" style={{ display: "flex", gap: 14, marginTop: 30, flexWrap: "wrap" }}>
             <Button variant="primary" size="lg" href="tel:8888954009" iconLeft={<PhoneIcon />}>
               Call Now
             </Button>
@@ -68,19 +72,20 @@ function Hero() {
             </Button>
           </div>
         </div>
-        <LeadForm compact title="Request Your Free Exit Analysis" />
+        <div className="hero-rise hero-rise-4">
+          <LeadForm compact title="Request Your Free Exit Analysis" />
+        </div>
       </div>
     </section>
   );
 }
 
+const TRUST_BRANDS = ["Wyndham", "Hilton Grand Vacations", "Marriott Vacation Club", "Diamond Resorts", "Westgate", "Bluegreen"];
+
 function TrustStrip() {
   return (
-    <div style={{ background: "var(--surface-inverse-2)", borderBottom: "1px solid var(--border-on-dark)" }}>
-      <div
-        className="container"
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 36, flexWrap: "wrap", padding: "18px var(--gutter)" }}
-      >
+    <div style={{ background: "var(--surface-inverse-2)", borderBottom: "1px solid var(--border-on-dark)", padding: "16px 0" }}>
+      <div className="container" style={{ textAlign: "center", paddingBottom: 10 }}>
         <span
           style={{
             fontFamily: "var(--font-label)",
@@ -92,11 +97,15 @@ function TrustStrip() {
         >
           As trusted by owners of
         </span>
-        {["Wyndham", "Hilton Grand Vacations", "Marriott Vacation Club", "Diamond Resorts", "Westgate"].map((b) => (
-          <span key={b} style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "rgba(255,255,255,0.72)", fontWeight: 500 }}>
-            {b}
-          </span>
-        ))}
+      </div>
+      <div className="marquee">
+        <div className="marquee-track">
+          {[...TRUST_BRANDS, ...TRUST_BRANDS].map((b, i) => (
+            <span key={i} style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "rgba(255,255,255,0.72)", fontWeight: 500, whiteSpace: "nowrap" }}>
+              {b}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -122,12 +131,14 @@ function IntroThreeUp() {
     <Section>
       <div className="grid-3-loose">
         {THREE_UP.map((x, i) => (
-          <div key={i} style={{ borderTop: "3px solid var(--teal-500)", paddingTop: 22 }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", fontWeight: 600, color: "var(--text-strong)", margin: 0 }}>
-              {x.t}
-            </h3>
-            <p style={{ marginTop: 12, fontSize: 16, lineHeight: 1.62, color: "var(--text-body)" }}>{x.d}</p>
-          </div>
+          <Reveal key={i} delay={i * 120}>
+            <div style={{ borderTop: "3px solid var(--teal-500)", paddingTop: 22 }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", fontWeight: 600, color: "var(--text-strong)", margin: 0 }}>
+                {x.t}
+              </h3>
+              <p style={{ marginTop: 12, fontSize: 16, lineHeight: 1.62, color: "var(--text-body)" }}>{x.d}</p>
+            </div>
+          </Reveal>
         ))}
       </div>
     </Section>
@@ -139,9 +150,11 @@ function ClearPath() {
   return (
     <Section dark>
       <div className="split-2">
-        <div style={{ borderRadius: "var(--radius-lg)", overflow: "hidden", height: 420, boxShadow: "var(--shadow-xl)" }}>
-          <CoverImage src={clearPath2} />
-        </div>
+        <Reveal>
+          <div className="zoom-frame" style={{ position: "relative", borderRadius: "var(--radius-lg)", overflow: "hidden", height: 420, boxShadow: "var(--shadow-xl)" }}>
+            <ParallaxImage src={clearPath2} strength={90} />
+          </div>
+        </Reveal>
         <div>
           <SectionHead
             onDark
@@ -200,9 +213,11 @@ function Services() {
       />
       <div className="grid-3">
         {SERVICES.map((s, i) => (
-          <ServiceCard key={i} title={s.t} icon={s.icon}>
-            {s.d}
-          </ServiceCard>
+          <Reveal key={i} delay={i * 120}>
+            <ServiceCard title={s.t} icon={s.icon} style={{ height: "100%" }}>
+              {s.d}
+            </ServiceCard>
+          </Reveal>
         ))}
       </div>
     </Section>
@@ -226,9 +241,11 @@ function Process() {
       />
       <div className="grid-4">
         {STEPS.map((s, i) => (
-          <ServiceCard key={i} step={i + 1} title={s.t}>
-            {s.d}
-          </ServiceCard>
+          <Reveal key={i} delay={i * 110}>
+            <ServiceCard step={i + 1} title={s.t} style={{ height: "100%" }}>
+              {s.d}
+            </ServiceCard>
+          </Reveal>
         ))}
       </div>
     </Section>
@@ -251,21 +268,27 @@ function WhoWeHelp() {
           <SectionHead eyebrow="Who We Help" title="If you're ready to move on, we're here to help" />
           <ul style={{ listStyle: "none", margin: "0 0 30px", padding: 0, display: "flex", flexDirection: "column", gap: 14 }}>
             {HELP.map((h, i) => (
-              <li key={i} style={{ display: "flex", gap: 13, alignItems: "flex-start", fontSize: 17, color: "var(--text-body)" }}>
-                <span style={{ flexShrink: 0, marginTop: 3, color: "var(--brand-accent-ink)" }}>
-                  <CheckIcon />
-                </span>
-                {h}
-              </li>
+              <Reveal key={i} delay={i * 100} y={18}>
+                <li style={{ display: "flex", gap: 13, alignItems: "flex-start", fontSize: 17, color: "var(--text-body)" }}>
+                  <span style={{ flexShrink: 0, marginTop: 3, color: "var(--brand-accent-ink)" }}>
+                    <CheckIcon />
+                  </span>
+                  {h}
+                </li>
+              </Reveal>
             ))}
           </ul>
-          <Button variant="secondary" size="lg" onClick={() => navigate("/consultation")}>
-            Get Started
-          </Button>
+          <Reveal delay={420} y={18}>
+            <Button variant="secondary" size="lg" onClick={() => navigate("/consultation")}>
+              Get Started
+            </Button>
+          </Reveal>
         </div>
-        <div style={{ borderRadius: "var(--radius-lg)", overflow: "hidden", height: 440, boxShadow: "var(--shadow-lg)" }}>
-          <CoverImage src={focusedImg} biasY={10} />
-        </div>
+        <Reveal delay={120}>
+          <div className="zoom-frame" style={{ position: "relative", borderRadius: "var(--radius-lg)", overflow: "hidden", height: 440, boxShadow: "var(--shadow-lg)" }}>
+            <ParallaxImage src={focusedImg} biasY={10} strength={80} />
+          </div>
+        </Reveal>
       </div>
     </Section>
   );
@@ -287,9 +310,10 @@ function FinalCTA() {
   return (
     <section style={{ background: "linear-gradient(120deg, var(--navy-800), var(--navy-950))", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, opacity: 0.22 }}>
-        <CoverImage src={clearPath} />
+        <ParallaxImage src={clearPath} strength={140} />
       </div>
       <div className="container" style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "var(--section-y) var(--gutter)" }}>
+        <Reveal>
         <Eyebrow onDark align="center">
           Focused on What Matters
         </Eyebrow>
@@ -313,6 +337,7 @@ function FinalCTA() {
         <Button variant="primary" size="lg" onClick={() => navigate("/consultation")}>
           Get Started
         </Button>
+        </Reveal>
       </div>
     </section>
   );

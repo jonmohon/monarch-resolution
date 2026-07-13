@@ -1,5 +1,6 @@
 import Eyebrow from "../ds/Eyebrow.jsx";
 import { CheckIcon } from "../components/icons.jsx";
+import { Reveal } from "../components/motion.jsx";
 import LeadForm from "../site/LeadForm.jsx";
 
 const CONSULT_POINTS = [
@@ -15,10 +16,13 @@ export default function ConsultationPage() {
       <section style={{ background: "linear-gradient(160deg, var(--navy-800), var(--navy-950))" }}>
         <div className="container consult-grid" style={{ padding: "80px var(--gutter)" }}>
           <div>
-            <Eyebrow onDark withRule>
-              Exit Consultation
-            </Eyebrow>
+            <div className="hero-rise">
+              <Eyebrow onDark withRule>
+                Exit Consultation
+              </Eyebrow>
+            </div>
             <h1
+              className="hero-rise hero-rise-1"
               style={{
                 fontFamily: "var(--font-display)",
                 fontWeight: 500,
@@ -30,12 +34,13 @@ export default function ConsultationPage() {
             >
               Start your free exit analysis today
             </h1>
-            <p style={{ fontSize: 19, lineHeight: 1.62, color: "rgba(255,255,255,0.88)", maxWidth: "48ch", margin: "0 0 34px" }}>
+            <p className="hero-rise hero-rise-2" style={{ fontSize: 19, lineHeight: 1.62, color: "rgba(255,255,255,0.88)", maxWidth: "48ch", margin: "0 0 34px" }}>
               Tell us about your timeshare and one of our advisors will reach out within one business day with realistic, no-pressure guidance.
             </p>
             <div className="consult-points">
               {CONSULT_POINTS.map(([t, d], i) => (
-                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <Reveal key={i} delay={i * 110} y={20}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                   <span style={{ color: "var(--teal-400)", flexShrink: 0, marginTop: 2 }}>
                     <CheckIcon />
                   </span>
@@ -56,10 +61,13 @@ export default function ConsultationPage() {
                     <div style={{ fontSize: 14.5, lineHeight: 1.5, color: "var(--text-on-dark-muted)" }}>{d}</div>
                   </div>
                 </div>
+                </Reveal>
               ))}
             </div>
           </div>
-          <LeadForm title="Request Your Free Exit Analysis" />
+          <div className="hero-rise hero-rise-3">
+            <LeadForm title="Request Your Free Exit Analysis" />
+          </div>
         </div>
       </section>
     </div>

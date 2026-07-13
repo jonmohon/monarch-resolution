@@ -1,4 +1,5 @@
 import Eyebrow from "../ds/Eyebrow.jsx";
+import { Reveal } from "./motion.jsx";
 
 export function Section({ children, alt = false, dark = false, style }) {
   return (
@@ -16,7 +17,7 @@ export function Section({ children, alt = false, dark = false, style }) {
 
 export function SectionHead({ eyebrow, title, intro, onDark = false, center = false, maxWidth = "60ch" }) {
   return (
-    <div
+    <Reveal
       style={{
         maxWidth: center ? "760px" : maxWidth,
         margin: center ? "0 auto" : 0,
@@ -56,6 +57,6 @@ export function SectionHead({ eyebrow, title, intro, onDark = false, center = fa
           {intro}
         </p>
       )}
-    </div>
+    </Reveal>
   );
 }

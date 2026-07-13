@@ -76,6 +76,48 @@
   .form-row, .consult-points { grid-template-columns: 1fr; }
 }
 
+/* --- Motion --- */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(42px); }
+  to   { opacity: 1; transform: none; }
+}
+.hero-rise   { animation: hero-rise 1s var(--ease-out) both; }
+.hero-rise-1 { animation-delay: 0.08s; }
+.hero-rise-2 { animation-delay: 0.18s; }
+.hero-rise-3 { animation-delay: 0.3s; }
+.hero-rise-4 { animation-delay: 0.42s; }
+
+@keyframes slow-zoom {
+  from { scale: 1; }
+  to   { scale: 1.12; }
+}
+.slow-zoom { animation: slow-zoom 14s var(--ease-out) both; }
+
+/* Trust-strip marquee */
+.marquee { overflow: hidden; position: relative; }
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  width: max-content;
+  padding-right: 56px;
+  animation: marquee 30s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Image hover zoom inside rounded frames */
+.zoom-frame img { transition: scale 1.2s var(--ease-out); }
+.zoom-frame:hover img { scale: 1.06; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise, .slow-zoom, .marquee-track { animation: none; }
+  .zoom-frame img { transition: none; }
+}
+
 /* Process page numbered step cards */
 .step-card {
   display: grid;

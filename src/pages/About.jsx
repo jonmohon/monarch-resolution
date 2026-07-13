@@ -1,5 +1,5 @@
 import Eyebrow from "../ds/Eyebrow.jsx";
-import CoverImage from "../components/CoverImage.jsx";
+import { ParallaxImage, Reveal } from "../components/motion.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ScheduleBand from "../components/ScheduleBand.jsx";
 import { Section } from "../components/Section.jsx";
@@ -18,7 +18,7 @@ export default function AboutPage() {
       />
       <Section>
         <div className="about-split">
-          <div>
+          <Reveal>
             <Eyebrow withRule>Our Commitment</Eyebrow>
             <h2
               style={{
@@ -40,10 +40,12 @@ export default function AboutPage() {
               Whether you're facing financial hardship, changes in your personal life, or simply wish to reassess your investment, our team of
               legal experts is here to guide you every step of the way toward a successful resolution.
             </p>
-          </div>
-          <div style={{ borderRadius: "var(--radius-lg)", overflow: "hidden", height: 440, boxShadow: "var(--shadow-lg)" }}>
-            <CoverImage src={commitment} />
-          </div>
+          </Reveal>
+          <Reveal delay={140}>
+            <div className="zoom-frame" style={{ position: "relative", borderRadius: "var(--radius-lg)", overflow: "hidden", height: 440, boxShadow: "var(--shadow-lg)" }}>
+              <ParallaxImage src={commitment} strength={85} />
+            </div>
+          </Reveal>
         </div>
       </Section>
       <ScheduleBand />
