@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Button from "../ds/Button.jsx";
 import Checkbox from "../ds/Checkbox.jsx";
 import Eyebrow from "../ds/Eyebrow.jsx";
@@ -113,7 +114,15 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
         required
         label={
           <>
-            I accept the <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a>, and consent to be contacted about my inquiry.
+            I accept the{" "}
+            <Link to="/terms" target="_blank">
+              Terms of Service
+            </Link>{" "}
+            &amp;{" "}
+            <Link to="/privacy" target="_blank">
+              Privacy Policy
+            </Link>
+            , and consent to be contacted about my inquiry.
           </>
         }
       />

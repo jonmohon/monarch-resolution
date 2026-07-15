@@ -75,7 +75,15 @@ export default function Footer() {
         }}
       >
         <span style={{ fontSize: 13, color: "var(--text-on-dark-muted)" }}>© 2026 Monarch Resolution.</span>
-        <span style={{ fontSize: 13, color: "var(--text-on-dark-muted)" }}>Privacy Policy · Terms of Service</span>
+        <span style={{ fontSize: 13, color: "var(--text-on-dark-muted)" }}>
+          <Link to="/privacy" style={{ color: "var(--text-on-dark-muted)" }}>
+            Privacy Policy
+          </Link>
+          {" · "}
+          <Link to="/terms" style={{ color: "var(--text-on-dark-muted)" }}>
+            Terms of Service
+          </Link>
+        </span>
       </div>
     </footer>
   );

@@ -7,6 +7,9 @@ import ProcessPage from "./pages/Process.jsx";
 import AboutPage from "./pages/About.jsx";
 import FaqsPage from "./pages/Faqs.jsx";
 import ConsultationPage from "./pages/Consultation.jsx";
+import PrivacyPage from "./pages/Privacy.jsx";
+import TermsPage from "./pages/Terms.jsx";
+import CookieNotice from "./site/CookieNotice.jsx";
 
 const TITLES = {
   "/": "Monarch Resolution — Timeshare Exit Experts",
@@ -14,6 +17,8 @@ const TITLES = {
   "/about": "About Us — Monarch Resolution",
   "/faqs": "FAQs — Monarch Resolution",
   "/consultation": "Free Exit Consultation — Monarch Resolution",
+  "/privacy": "Privacy Policy — Monarch Resolution",
+  "/terms": "Terms of Service — Monarch Resolution",
 };
 
 export default function App() {
@@ -33,9 +38,12 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/faqs" element={<FaqsPage />} />
         <Route path="/consultation" element={<ConsultationPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
       <Footer />
+      <CookieNotice />
     </div>
   );
 }
