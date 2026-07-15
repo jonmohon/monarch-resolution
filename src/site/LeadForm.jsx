@@ -5,6 +5,7 @@ import Checkbox from "../ds/Checkbox.jsx";
 import Eyebrow from "../ds/Eyebrow.jsx";
 import Input from "../ds/Input.jsx";
 import Select from "../ds/Select.jsx";
+import { trackLeadConversion } from "../lib/leadTracking.js";
 
 // Lead endpoint: API Gateway -> Lambda (monarch-lead-handler, us-west-2).
 // Sends the internal notification + customer thank-you via SES and posts to Discord.
@@ -34,6 +35,9 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Something went wrong.");
       }
+      // Lead saved — fire Microsoft UET conversion + push to the Zapier pipeline
+      // (CRM + Sheet). Best-effort; never blocks the thank-you screen.
+      trackLeadConversion(fields);
       setSent(true);
     } catch (err) {
       setError(err.message === "Failed to fetch" ? "Network error — please try again or call (888) 895-4009." : err.message);
