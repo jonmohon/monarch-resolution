@@ -36,6 +36,7 @@ export function sendLeadToPipeline(fields) {
     email: fields.email || "",
     timeshare_developer: fields.developer || "",
     maintenance_fee: fields.fee || "",
+    mortgage_balance: fields.mortgage || "",
     how_heard: fields.source || "",
     msclkid: attr.msclkid || "",
     utm_source: attr.utm_source || "",

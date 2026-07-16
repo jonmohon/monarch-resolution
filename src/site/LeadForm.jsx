@@ -13,7 +13,7 @@ const LEAD_ENDPOINT = "https://wucqsnrg8c.execute-api.us-west-2.amazonaws.com/";
 
 // Compact lead-capture form used in the hero and the consultation page.
 export default function LeadForm({ title = "Request Your Free Exit Analysis", compact = false }) {
-  const [fields, setFields] = useState({ name: "", phone: "", email: "", developer: "", fee: "", source: "" });
+  const [fields, setFields] = useState({ name: "", phone: "", email: "", developer: "", fee: "", mortgage: "", source: "" });
   const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
@@ -105,6 +105,7 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
         />
         <Input label="Maintenance Fee" placeholder="$ / year" required value={fields.fee} onChange={set("fee")} />
       </div>
+      <Input label="Mortgage Balance" placeholder="$ remaining (or “paid off”)" value={fields.mortgage} onChange={set("mortgage")} />
       <Select
         label="How did you hear about us"
         required

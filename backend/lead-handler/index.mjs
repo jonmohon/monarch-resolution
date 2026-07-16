@@ -145,6 +145,7 @@ A new exit-analysis request just came in from <strong>monarchresolution.com</str
   ${row("Email", `<a href="mailto:${esc(lead.email)}" style="color:${TEAL};text-decoration:none;">${esc(lead.email)}</a>`)}
   ${row("Developer", esc(lead.developer))}
   ${row("Maintenance Fee", esc(lead.fee))}
+  ${row("Mortgage Balance", esc(lead.mortgage))}
   ${row("Heard About Us", esc(lead.source))}
   ${row("Submitted", esc(meta.submittedAt))}
   ${row("Page", esc(meta.page))}
@@ -165,6 +166,7 @@ Phone: ${lead.phone}
 Email: ${lead.email}
 Developer: ${lead.developer || "-"}
 Maintenance fee: ${lead.fee || "-"}
+Mortgage balance: ${lead.mortgage || "-"}
 Heard about us: ${lead.source || "-"}
 Submitted: ${meta.submittedAt}
 Page: ${meta.page || "-"}`,
@@ -204,6 +206,7 @@ async function postDiscord(lead, meta) {
           { name: "Email", value: lead.email || "—", inline: false },
           { name: "Developer", value: lead.developer || "—", inline: true },
           { name: "Maintenance Fee", value: lead.fee || "—", inline: true },
+          { name: "Mortgage Balance", value: lead.mortgage || "—", inline: true },
           { name: "Heard About Us", value: lead.source || "—", inline: true },
         ],
         footer: { text: "monarchresolution.com" },
