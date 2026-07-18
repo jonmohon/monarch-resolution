@@ -1,12 +1,25 @@
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 
 const ses = new SESv2Client({});
+const ddb = new DynamoDBClient({});
 
 const FROM = process.env.FROM_ADDRESS || "Monarch Resolution <info@monarchresolution.com>";
 const TO_INTERNAL = process.env.TO_INTERNAL || "info@monarchresolution.com";
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
-const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET || "";
 const MIN_FILL_MS = 2500; // humans don't complete this form faster than ~2.5s
+
+// reCAPTCHA Enterprise (assessment API). All three must be set to enforce;
+// otherwise verification is skipped (form still protected by the other layers).
+const RECAPTCHA_PROJECT_ID = process.env.RECAPTCHA_PROJECT_ID || "";
+const RECAPTCHA_API_KEY = process.env.RECAPTCHA_API_KEY || "";
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || "";
+
+// Per-IP rate limit (DynamoDB fixed-window). Empty table name = disabled.
+const RATELIMIT_TABLE = process.env.RATELIMIT_TABLE || "";
+const RL_WINDOW_S = 600; // 10-minute window
+const RL_MAX = 6; // accepted submissions per IP per window before silent-drop
+
 const SITE = "https://monarchresolution.com";
 const LOGO_WHITE = `${SITE}/email/monarch-logo-white.png`;
 const PHONE_DISPLAY = "(888) 895-4009";
@@ -227,24 +240,54 @@ async function postDiscord(lead, meta) {
   if (!res.ok) throw new Error(`Discord webhook failed: ${res.status}`);
 }
 
-// Verify a reCAPTCHA v3 token with Google. Returns false only on a *confirmed*
-// bad token (failure or low score); fails OPEN on network errors so a Google
-// outage never blocks real leads. v2 tokens (no score) pass on success.
-async function verifyRecaptcha(token) {
-  if (!token) return true; // no token → don't block here; other layers apply
+// Verify a reCAPTCHA Enterprise token by creating an assessment. Returns false
+// only on a *confirmed* bad token (invalid, wrong action, or low score). Fails
+// OPEN when unconfigured, when no token is present, or on a network error, so a
+// misconfig or Google outage never blocks real leads.
+async function verifyRecaptcha(token, action = "lead_submit") {
+  if (!token) return true; // no token → rely on the other layers
+  if (!(RECAPTCHA_PROJECT_ID && RECAPTCHA_API_KEY && RECAPTCHA_SITE_KEY)) return true; // not configured yet
   try {
-    const res = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+    const url = `https://recaptchaenterprise.googleapis.com/v1/projects/${RECAPTCHA_PROJECT_ID}/assessments?key=${RECAPTCHA_API_KEY}`;
+    const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ secret: RECAPTCHA_SECRET, response: token }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: { token, siteKey: RECAPTCHA_SITE_KEY, expectedAction: action } }),
     });
     const data = await res.json();
-    if (!data.success) return false;
-    if (typeof data.score === "number" && data.score < 0.5) return false;
+    if (!data?.tokenProperties?.valid) return false;
+    if (data.tokenProperties.action && data.tokenProperties.action !== action) return false;
+    const score = data?.riskAnalysis?.score;
+    if (typeof score === "number" && score < 0.5) return false;
     return true;
   } catch (e) {
-    console.error("reCAPTCHA verify error (failing open):", e);
+    console.error("reCAPTCHA assessment error (failing open):", e);
     return true;
+  }
+}
+
+// Per-IP fixed-window rate limit backed by DynamoDB. Fails OPEN on any error so
+// a table/permissions issue never blocks real leads.
+async function rateLimited(ip) {
+  if (!RATELIMIT_TABLE || !ip) return false;
+  const now = Math.floor(Date.now() / 1000);
+  const bucket = Math.floor(now / RL_WINDOW_S);
+  const ttl = (bucket + 1) * RL_WINDOW_S + 120;
+  try {
+    const res = await ddb.send(
+      new UpdateItemCommand({
+        TableName: RATELIMIT_TABLE,
+        Key: { pk: { S: `${ip}:${bucket}` } },
+        UpdateExpression: "SET #t = if_not_exists(#t, :ttl) ADD #c :one",
+        ExpressionAttributeNames: { "#t": "ttl", "#c": "count" },
+        ExpressionAttributeValues: { ":ttl": { N: String(ttl) }, ":one": { N: "1" } },
+        ReturnValues: "UPDATED_NEW",
+      })
+    );
+    return Number(res.Attributes?.count?.N || "0") > RL_MAX;
+  } catch (e) {
+    console.error("rate-limit check error (failing open):", e);
+    return false;
   }
 }
 
@@ -314,11 +357,14 @@ export const handler = async (event) => {
   // 4) Content heuristics — links/spam keywords, absurd lengths, junk phone.
   if (looksLikeSpam(lead)) return silentDrop("spam-content");
 
-  // 5) reCAPTCHA v3 — only enforced when a secret is configured; verify fails
-  //    open on Google outages and on missing tokens (adblock-safe).
-  if (RECAPTCHA_SECRET) {
-    const ok = await verifyRecaptcha(String(lead.recaptchaToken || ""));
-    if (!ok) return silentDrop("recaptcha");
+  // 5) Per-IP rate limit — caps volumetric abuse from a single source.
+  const ip = event.requestContext?.http?.sourceIp || "";
+  if (await rateLimited(ip)) return silentDrop(`rate-limit:${ip}`);
+
+  // 6) reCAPTCHA Enterprise — self-skips when unconfigured or token missing;
+  //    fails open on Google outages. Drops only a confirmed bad/low-score token.
+  if (!(await verifyRecaptcha(String(lead.recaptchaToken || ""), "lead_submit"))) {
+    return silentDrop("recaptcha");
   }
 
   const meta = {

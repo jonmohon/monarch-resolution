@@ -11,7 +11,7 @@
 // (The Microsoft UET ad tag + Meta tracking are separate and are NOT gated here.)
 
 export const CLARITY_PROJECT_ID = "xoj91jlsbf";
-export const GA4_MEASUREMENT_ID = ""; // e.g. "G-XXXXXXXXXX"
+export const GA4_MEASUREMENT_ID = "G-CPC2RCTNR5";
 
 // ── reCAPTCHA v3 (bot protection on the lead form) ──────────────────────────
 // PUBLIC site key only — safe to ship in the client bundle. The matching SECRET
