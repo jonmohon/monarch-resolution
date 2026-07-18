@@ -5,6 +5,7 @@ import Checkbox from "../ds/Checkbox.jsx";
 import Eyebrow from "../ds/Eyebrow.jsx";
 import Input from "../ds/Input.jsx";
 import Select from "../ds/Select.jsx";
+import { getAttribution } from "../lib/attribution.js";
 import { trackLeadConversion } from "../lib/leadTracking.js";
 
 // Lead endpoint: API Gateway -> Lambda (monarch-lead-handler, us-west-2).
@@ -26,10 +27,15 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
     setError("");
     setSending(true);
     try {
+      // Attribution: a Microsoft/Bing ad click carries an msclkid. Pass it (and a
+      // readable lead_source) to the Lambda so the Discord notification can show
+      // "Bing" vs "Website". Pipeline CRM source stays "Nexvato" (set in the Zap).
+      const attr = getAttribution();
+      const leadSource = attr.msclkid ? "Bing" : "Website";
       const res = await fetch(LEAD_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, page: window.location.href }),
+        body: JSON.stringify({ ...fields, page: window.location.href, msclkid: attr.msclkid || "", lead_source: leadSource }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

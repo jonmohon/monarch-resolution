@@ -147,6 +147,7 @@ A new exit-analysis request just came in from <strong>monarchresolution.com</str
   ${row("Maintenance Fee", esc(lead.fee))}
   ${row("Mortgage Balance", esc(lead.mortgage))}
   ${row("Heard About Us", esc(lead.source))}
+  ${row("Lead Source", esc(lead.lead_source))}
   ${row("Submitted", esc(meta.submittedAt))}
   ${row("Page", esc(meta.page))}
 </table>
@@ -168,6 +169,7 @@ Developer: ${lead.developer || "-"}
 Maintenance fee: ${lead.fee || "-"}
 Mortgage balance: ${lead.mortgage || "-"}
 Heard about us: ${lead.source || "-"}
+Lead source: ${lead.lead_source || "-"}
 Submitted: ${meta.submittedAt}
 Page: ${meta.page || "-"}`,
   };
@@ -208,6 +210,7 @@ async function postDiscord(lead, meta) {
           { name: "Maintenance Fee", value: lead.fee || "—", inline: true },
           { name: "Mortgage Balance", value: lead.mortgage || "—", inline: true },
           { name: "Heard About Us", value: lead.source || "—", inline: true },
+          { name: "Lead Source", value: lead.lead_source || "—", inline: true },
         ],
         footer: { text: "monarchresolution.com" },
         timestamp: new Date().toISOString(),

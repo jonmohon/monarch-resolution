@@ -44,8 +44,8 @@ export function sendLeadToPipeline(fields) {
     utm_campaign: attr.utm_campaign || "",
     page_url: window.location.href,
     submitted_at: new Date().toISOString(),
-    // Attribute to Microsoft when a click ID is present, otherwise generic website.
-    lead_source: attr.msclkid ? "Microsoft Ads" : "Website",
+    // Attribute to Bing (Microsoft Ads) when a click ID is present, else generic website.
+    lead_source: attr.msclkid ? "Bing" : "Website",
   };
 
   // Zapier Catch Hooks don't return CORS headers, so a normal (cors) fetch throws
