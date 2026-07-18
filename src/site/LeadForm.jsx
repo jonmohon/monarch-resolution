@@ -72,9 +72,29 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
           </svg>
         </div>
         <h3 style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-strong)", margin: "0 0 8px" }}>Thank you.</h3>
-        <p style={{ margin: 0, color: "var(--text-body)" }}>
+        <p style={{ margin: "0 0 20px", color: "var(--text-body)" }}>
           An exit advisor will reach out within one business day to explain your realistic options. A confirmation email is on its way to you now.
         </p>
+        <p style={{ margin: "0 0 10px", fontSize: 14, color: "var(--text-body)" }}>Prefer to talk now? Call us directly:</p>
+        <a
+          href="tel:+18888954009"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "12px 22px",
+            borderRadius: "var(--radius-md, 10px)",
+            background: "var(--brand-accent-ink, #0f766e)",
+            color: "#fff",
+            fontWeight: 600,
+            textDecoration: "none",
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
+          </svg>
+          (888) 895-4009
+        </a>
       </div>
     );
   }
