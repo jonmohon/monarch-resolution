@@ -10,7 +10,7 @@
 // Both only load AFTER a visitor clicks "Accept" in the consent banner.
 // (The Microsoft UET ad tag + Meta tracking are separate and are NOT gated here.)
 
-export const CLARITY_PROJECT_ID = ""; // e.g. "abcd1234ef"
+export const CLARITY_PROJECT_ID = "xoj91jlsbf";
 export const GA4_MEASUREMENT_ID = ""; // e.g. "G-XXXXXXXXXX"
 
 // ── reCAPTCHA v3 (bot protection on the lead form) ──────────────────────────
