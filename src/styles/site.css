@@ -133,3 +133,9 @@
 @media (max-width: 600px) {
   .step-card { grid-template-columns: 1fr; gap: 12px; padding: 26px 24px; }
 }
+
+/* reCAPTCHA v3 badge hidden — the lead form shows the required Google disclosure
+   text instead (permitted by Google's branding guidelines). */
+.grecaptcha-badge {
+  visibility: hidden;
+}

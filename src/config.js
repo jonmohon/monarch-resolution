@@ -12,3 +12,9 @@
 
 export const CLARITY_PROJECT_ID = ""; // e.g. "abcd1234ef"
 export const GA4_MEASUREMENT_ID = ""; // e.g. "G-XXXXXXXXXX"
+
+// ── reCAPTCHA v3 (bot protection on the lead form) ──────────────────────────
+// PUBLIC site key only — safe to ship in the client bundle. The matching SECRET
+// key lives in the Lambda env var RECAPTCHA_SECRET (never committed).
+// Blank = reCAPTCHA disabled (honeypot + time-trap still protect the form).
+export const RECAPTCHA_SITE_KEY = "6LdlzFctAAAAAAuHfchLVhCDIjDr9kA8Kcyo3aZa";

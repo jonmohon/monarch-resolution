@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../ds/Button.jsx";
 import Checkbox from "../ds/Checkbox.jsx";
@@ -7,6 +7,8 @@ import Input from "../ds/Input.jsx";
 import Select from "../ds/Select.jsx";
 import { getAttribution } from "../lib/attribution.js";
 import { trackLeadConversion } from "../lib/leadTracking.js";
+import { loadRecaptcha, getRecaptchaToken } from "../lib/recaptcha.js";
+import { RECAPTCHA_SITE_KEY } from "../config.js";
 
 // Lead endpoint: API Gateway -> Lambda (monarch-lead-handler, us-west-2).
 // Sends the internal notification + customer thank-you via SES and posts to Discord.
@@ -19,8 +21,17 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+  // Bot traps: a hidden honeypot bots auto-fill, and the time the form loaded so
+  // the server can reject submissions completed impossibly fast.
+  const [company, setCompany] = useState("");
+  const [loadedAt] = useState(() => Date.now());
 
   const set = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
+
+  // Preload reCAPTCHA v3 so the token is ready by the time the user submits.
+  useEffect(() => {
+    loadRecaptcha();
+  }, []);
 
   async function submit(e) {
     e.preventDefault();
@@ -32,10 +43,20 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
       // "Bing" vs "Website". Pipeline CRM source stays "Nexvato" (set in the Zap).
       const attr = getAttribution();
       const leadSource = attr.msclkid ? "Bing" : "Website";
+      const recaptchaToken = await getRecaptchaToken("lead_submit");
       const res = await fetch(LEAD_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, page: window.location.href, msclkid: attr.msclkid || "", lead_source: leadSource }),
+        body: JSON.stringify({
+          ...fields,
+          page: window.location.href,
+          msclkid: attr.msclkid || "",
+          lead_source: leadSource,
+          // bot-protection signals (see backend/lead-handler)
+          company, // honeypot — must stay empty
+          elapsedMs: Date.now() - loadedAt, // time-trap
+          recaptchaToken,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -116,6 +137,20 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
         <Eyebrow>Get Your Quote</Eyebrow>
         <h3 style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-strong)", margin: "8px 0 0", lineHeight: 1.15 }}>{title}</h3>
       </div>
+      {/* Honeypot: hidden from humans, bots fill it → server silently drops the lead. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: "auto", width: 1, height: 1, overflow: "hidden" }}>
+        <label>
+          Company
+          <input
+            type="text"
+            name="company"
+            tabIndex={-1}
+            autoComplete="off"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+          />
+        </label>
+      </div>
       <div className="form-row">
         <Input label="Name" placeholder="Full name" required value={fields.name} onChange={set("name")} />
         <Input label="Phone #" type="tel" placeholder="(555) 000-0000" required value={fields.phone} onChange={set("phone")} />
@@ -174,6 +209,19 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
       <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}>
         {sending ? "Sending…" : "Request Free Analysis"}
       </Button>
+      {RECAPTCHA_SITE_KEY && (
+        <p style={{ margin: 0, fontSize: 11, lineHeight: 1.5, color: "var(--text-muted, #64748b)", textAlign: "center" }}>
+          This site is protected by reCAPTCHA and the Google{" "}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
+            Privacy Policy
+          </a>{" "}
+          and{" "}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
+            Terms of Service
+          </a>{" "}
+          apply.
+        </p>
+      )}
     </form>
   );
 }

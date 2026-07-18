@@ -5,6 +5,8 @@ const ses = new SESv2Client({});
 const FROM = process.env.FROM_ADDRESS || "Monarch Resolution <info@monarchresolution.com>";
 const TO_INTERNAL = process.env.TO_INTERNAL || "info@monarchresolution.com";
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
+const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET || "";
+const MIN_FILL_MS = 2500; // humans don't complete this form faster than ~2.5s
 const SITE = "https://monarchresolution.com";
 const LOGO_WHITE = `${SITE}/email/monarch-logo-white.png`;
 const PHONE_DISPLAY = "(888) 895-4009";
@@ -225,6 +227,37 @@ async function postDiscord(lead, meta) {
   if (!res.ok) throw new Error(`Discord webhook failed: ${res.status}`);
 }
 
+// Verify a reCAPTCHA v3 token with Google. Returns false only on a *confirmed*
+// bad token (failure or low score); fails OPEN on network errors so a Google
+// outage never blocks real leads. v2 tokens (no score) pass on success.
+async function verifyRecaptcha(token) {
+  if (!token) return true; // no token → don't block here; other layers apply
+  try {
+    const res = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ secret: RECAPTCHA_SECRET, response: token }),
+    });
+    const data = await res.json();
+    if (!data.success) return false;
+    if (typeof data.score === "number" && data.score < 0.5) return false;
+    return true;
+  } catch (e) {
+    console.error("reCAPTCHA verify error (failing open):", e);
+    return true;
+  }
+}
+
+// True if the submission looks like spam/bot content.
+function looksLikeSpam(lead) {
+  const blob = `${lead.name || ""} ${lead.developer || ""} ${lead.source || ""} ${lead.fee || ""} ${lead.mortgage || ""}`;
+  if (/https?:\/\/|www\.|<a\s|\[url|\bviagra\b|\bcasino\b|\bcrypto\b/i.test(blob)) return true;
+  if (String(lead.name || "").length > 100 || String(lead.email || "").length > 150) return true;
+  if (String(lead.phone || "").length > 40) return true;
+  if (String(lead.phone || "").replace(/\D/g, "").length < 7) return true;
+  return false;
+}
+
 export const handler = async (event) => {
   const respond = (statusCode, body) => ({
     statusCode,
@@ -252,8 +285,41 @@ export const handler = async (event) => {
   const missing = required.filter((k) => !String(lead[k] || "").trim());
   if (missing.length) return respond(400, { error: `Missing: ${missing.join(", ")}` });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(lead.email)) return respond(400, { error: "Invalid email" });
-  // basic honeypot: bots fill every field; real form never sends `company`
-  if (lead.company) return respond(200, { ok: true });
+
+  // ── Bot protection ────────────────────────────────────────────────────────
+  // Silent drops (200 ok) so bots get no signal to tune against; the visitor
+  // side just sees the normal success path.
+  const silentDrop = (why) => {
+    console.warn("Dropped suspected bot lead:", why, { email: lead.email, page: lead.page });
+    return respond(200, { ok: true });
+  };
+
+  // 1) Honeypot — hidden `company` field; humans never fill it.
+  if (String(lead.company || "").trim()) return silentDrop("honeypot");
+
+  // 2) Time-trap — form completed impossibly fast.
+  const elapsedMs = Number(lead.elapsedMs);
+  if (Number.isFinite(elapsedMs) && elapsedMs >= 0 && elapsedMs < MIN_FILL_MS) {
+    return silentDrop(`too-fast:${elapsedMs}ms`);
+  }
+
+  // 3) Origin check — a real submit carries our site's Origin/Referer. Reject
+  //    only when a foreign origin is explicitly present (absent = allow).
+  const h = event.headers || {};
+  const origin = h.origin || h.Origin || h.referer || h.Referer || "";
+  if (origin && !/^https?:\/\/(www\.)?monarchresolution\.com([/:]|$)/.test(origin)) {
+    return silentDrop(`bad-origin:${origin}`);
+  }
+
+  // 4) Content heuristics — links/spam keywords, absurd lengths, junk phone.
+  if (looksLikeSpam(lead)) return silentDrop("spam-content");
+
+  // 5) reCAPTCHA v3 — only enforced when a secret is configured; verify fails
+  //    open on Google outages and on missing tokens (adblock-safe).
+  if (RECAPTCHA_SECRET) {
+    const ok = await verifyRecaptcha(String(lead.recaptchaToken || ""));
+    if (!ok) return silentDrop("recaptcha");
+  }
 
   const meta = {
     submittedAt: new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles", dateStyle: "medium", timeStyle: "short" }) + " PT",
