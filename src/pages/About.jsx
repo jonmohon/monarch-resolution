@@ -6,9 +6,10 @@ import { ParallaxImage, Reveal } from "../components/motion.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ScheduleBand from "../components/ScheduleBand.jsx";
 import { Section, SectionHead } from "../components/Section.jsx";
-import aboutHero from "../assets/about-hero.jpg";
-import commitment from "../assets/commitment.jpg";
-import lukePhoto from "../assets/luke.jpeg";
+import Seo from "../components/Seo.jsx";
+import aboutHero from "../assets/about-hero.webp";
+import commitment from "../assets/commitment.webp";
+import lukePhoto from "../assets/luke.webp";
 const OWNER_PHOTO = lukePhoto;
 
 function OwnerPortrait() {
@@ -25,7 +26,7 @@ function OwnerPortrait() {
       }}
     >
       {OWNER_PHOTO ? (
-        <img src={OWNER_PHOTO} alt="Luke King, Founder & Owner of Monarch Resolution" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        <img src={OWNER_PHOTO} alt="Luke King, Founder & Owner of Monarch Resolution" loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
       ) : (
         <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
           <div style={{ textAlign: "center" }}>
@@ -337,6 +338,7 @@ function ValuesBand() {
 export default function AboutPage() {
   return (
     <div>
+      <Seo path="/about" />
       <PageHero
         eyebrow="About Us"
         title="Boutique Service. Direct Access. Real Advocacy."

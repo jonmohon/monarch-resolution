@@ -7,18 +7,19 @@ import { ParallaxImage, Reveal } from "../components/motion.jsx";
 import { Section, SectionHead } from "../components/Section.jsx";
 import { CheckIcon, LifebuoyIcon, PhoneIcon, RouteIcon, SealIcon } from "../components/icons.jsx";
 import LeadForm from "../site/LeadForm.jsx";
+import Seo from "../components/Seo.jsx";
 import { FAQS } from "../data.js";
-import heroImg from "../assets/hero.jpg";
-import clearPath2 from "../assets/clear-path-2.jpg";
-import clearPath from "../assets/clear-path.jpg";
-import focusedImg from "../assets/focused.jpg";
+import heroImg from "../assets/hero.webp";
+import clearPath2 from "../assets/clear-path-2.webp";
+import clearPath from "../assets/clear-path.webp";
+import focusedImg from "../assets/focused.webp";
 
 function Hero() {
   const navigate = useNavigate();
   return (
     <section style={{ position: "relative", background: "var(--navy-900)", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0 }}>
-        <ParallaxImage src={heroImg} biasY={0} strength={180} imgStyle={{ scale: "1.08" }} />
+        <ParallaxImage src={heroImg} biasY={0} strength={180} eager imgStyle={{ scale: "1.08" }} />
         <div
           style={{
             position: "absolute",
@@ -346,6 +347,7 @@ function FinalCTA() {
 export default function HomePage() {
   return (
     <div>
+      <Seo path="/" />
       <Hero />
       <TrustStrip />
       <IntroThreeUp />

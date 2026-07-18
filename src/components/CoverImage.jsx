@@ -7,6 +7,8 @@ export default function CoverImage({ src, alt = "", biasY = 0, style }) {
     <img
       src={src}
       alt={alt}
+      loading="lazy"
+      decoding="async"
       style={{
         display: "block",
         width: "100%",

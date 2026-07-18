@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import LegalPage, { LegalList, LegalSection, LegalText } from "../components/LegalPage.jsx";
+import Seo from "../components/Seo.jsx";
 
 export default function TermsPage() {
   return (
-    <LegalPage eyebrow="Legal" title="Terms of Service" effective="July 15, 2026">
+    <>
+      <Seo path="/terms" />
+      <LegalPage eyebrow="Legal" title="Terms of Service" effective="July 15, 2026">
       <LegalSection title="1. Agreement to These Terms">
         <LegalText>
           These Terms of Service ("Terms") govern your use of monarchresolution.com (the "Site"), operated by Monarch Resolution ("Monarch," "we,"
@@ -131,6 +134,7 @@ export default function TermsPage() {
           (888) 895-4009
         </LegalText>
       </LegalSection>
-    </LegalPage>
+      </LegalPage>
+    </>
   );
 }

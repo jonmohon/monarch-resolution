@@ -84,7 +84,7 @@ export function useParallax(strength = 120) {
  * side, that glides against the scroll direction. Drop inside any
  * position:relative (or absolute) container with overflow hidden.
  */
-export function ParallaxImage({ src, alt = "", strength = 130, biasY = 0, imgStyle, style }) {
+export function ParallaxImage({ src, alt = "", strength = 130, biasY = 0, eager = false, imgStyle, style }) {
   const ref = useParallax(strength);
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", ...style }}>
@@ -92,6 +92,8 @@ export function ParallaxImage({ src, alt = "", strength = 130, biasY = 0, imgSty
         ref={ref}
         src={src}
         alt={alt}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
         style={{
           position: "absolute",
           left: 0,

@@ -2,6 +2,7 @@ import Eyebrow from "../ds/Eyebrow.jsx";
 import { CheckIcon } from "../components/icons.jsx";
 import { Reveal } from "../components/motion.jsx";
 import LeadForm from "../site/LeadForm.jsx";
+import Seo from "../components/Seo.jsx";
 
 const CONSULT_POINTS = [
   ["No obligation", "A free, honest assessment of your realistic options."],
@@ -13,6 +14,7 @@ const CONSULT_POINTS = [
 export default function ConsultationPage() {
   return (
     <div>
+      <Seo path="/consultation" />
       <section style={{ background: "linear-gradient(160deg, var(--navy-800), var(--navy-950))" }}>
         <div className="container consult-grid" style={{ padding: "80px var(--gutter)" }}>
           <div>

@@ -1,8 +1,11 @@
 import LegalPage, { LegalList, LegalSection, LegalText } from "../components/LegalPage.jsx";
+import Seo from "../components/Seo.jsx";
 
 export default function PrivacyPage() {
   return (
-    <LegalPage eyebrow="Legal" title="Privacy Policy" effective="July 15, 2026">
+    <>
+      <Seo path="/privacy" />
+      <LegalPage eyebrow="Legal" title="Privacy Policy" effective="July 15, 2026">
       <LegalSection title="1. Who We Are">
         <LegalText>
           This Privacy Policy describes how Monarch Resolution ("Monarch," "we," "us," or "our") collects, uses, and shares information about you
@@ -63,8 +66,29 @@ export default function PrivacyPage() {
               </a>
               .
             </>,
+            <>
+              <strong>Microsoft Clarity (analytics).</strong> With your consent, we use Microsoft Clarity to understand how visitors interact with
+              the Site through aggregated metrics, heatmaps, and session replays. This helps us diagnose usability issues and improve the Site. See{" "}
+              <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noreferrer">
+                Microsoft's Privacy Statement
+              </a>
+              .
+            </>,
+            <>
+              <strong>Google Analytics 4 (analytics).</strong> With your consent, we use Google Analytics to measure traffic sources, page
+              performance, and conversion rates so we can improve the Site. Learn more at{" "}
+              <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
+                Google's Privacy Policy
+              </a>
+              .
+            </>,
           ]}
         />
+        <LegalText>
+          When you first visit, we ask for your consent before loading the analytics cookies described above (Microsoft Clarity and Google
+          Analytics). You can decline, and you can change your choice at any time by clearing this site's data in your browser. The Microsoft
+          Advertising and Meta technologies above support the ad campaigns that fund this service.
+        </LegalText>
         <LegalText>
           You can control cookies through your browser settings, and you can opt out of interest-based advertising through the tools at{" "}
           <a href="https://optout.aboutads.info" target="_blank" rel="noreferrer">
@@ -163,6 +187,7 @@ export default function PrivacyPage() {
           (888) 895-4009
         </LegalText>
       </LegalSection>
-    </LegalPage>
+      </LegalPage>
+    </>
   );
 }

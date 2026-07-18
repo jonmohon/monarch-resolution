@@ -2,7 +2,8 @@ import { Reveal } from "../components/motion.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ScheduleBand from "../components/ScheduleBand.jsx";
 import { Section, SectionHead } from "../components/Section.jsx";
-import clearPathOut from "../assets/clear-path-out.jpg";
+import Seo from "../components/Seo.jsx";
+import clearPathOut from "../assets/clear-path-out.webp";
 
 const TITLE_STEPS = [
   {
@@ -25,6 +26,7 @@ const TITLE_STEPS = [
 export default function ProcessPage() {
   return (
     <div>
+      <Seo path="/process" />
       <PageHero
         eyebrow="Process"
         title="Your Proven Path to Timeshare Freedom"

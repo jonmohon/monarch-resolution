@@ -4,11 +4,14 @@ import PageHero from "../components/PageHero.jsx";
 import ScheduleBand from "../components/ScheduleBand.jsx";
 import { Section } from "../components/Section.jsx";
 import { FAQS } from "../data.js";
-import whoWeHelp from "../assets/who-we-help.jpg";
+import Seo from "../components/Seo.jsx";
+import { faqJsonLd } from "../lib/seo.js";
+import whoWeHelp from "../assets/who-we-help.webp";
 
 export default function FaqsPage() {
   return (
     <div>
+      <Seo path="/faqs" jsonLd={faqJsonLd(FAQS)} />
       <PageHero
         eyebrow="FAQs"
         title="Answers About Timeshare Exit"

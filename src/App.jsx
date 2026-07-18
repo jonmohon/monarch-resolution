@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import NavBar from "./site/NavBar.jsx";
 import Footer from "./site/Footer.jsx";
 import HomePage from "./pages/Home.jsx";
@@ -9,41 +10,40 @@ import FaqsPage from "./pages/Faqs.jsx";
 import ConsultationPage from "./pages/Consultation.jsx";
 import PrivacyPage from "./pages/Privacy.jsx";
 import TermsPage from "./pages/Terms.jsx";
-import CookieNotice from "./site/CookieNotice.jsx";
-
-const TITLES = {
-  "/": "Monarch Resolution — Timeshare Exit Experts",
-  "/process": "Our Process — Monarch Resolution",
-  "/about": "About Us — Monarch Resolution",
-  "/faqs": "FAQs — Monarch Resolution",
-  "/consultation": "Free Exit Consultation — Monarch Resolution",
-  "/privacy": "Privacy Policy — Monarch Resolution",
-  "/terms": "Terms of Service — Monarch Resolution",
-};
+import ConsentBanner from "./site/ConsentBanner.jsx";
+import { ORGANIZATION_JSONLD, WEBSITE_JSONLD } from "./lib/seo.js";
 
 export default function App() {
   const { pathname } = useLocation();
 
+  // Reset scroll on client-side navigation. (Titles/meta are owned by <Seo> per page.)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
-    document.title = TITLES[pathname] || TITLES["/"];
   }, [pathname]);
 
   return (
     <div>
+      {/* Site-wide structured data — present on every page. */}
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(ORGANIZATION_JSONLD)}</script>
+        <script type="application/ld+json">{JSON.stringify(WEBSITE_JSONLD)}</script>
+      </Helmet>
+
       <NavBar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/process" element={<ProcessPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/faqs" element={<FaqsPage />} />
-        <Route path="/consultation" element={<ConsultationPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="*" element={<HomePage />} />
-      </Routes>
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/process" element={<ProcessPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/faqs" element={<FaqsPage />} />
+          <Route path="/consultation" element={<ConsultationPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="*" element={<HomePage />} />
+        </Routes>
+      </main>
       <Footer />
-      <CookieNotice />
+      <ConsentBanner />
     </div>
   );
 }
