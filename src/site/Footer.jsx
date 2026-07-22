@@ -50,6 +50,14 @@ export default function Footer() {
           <a href="tel:8888954009" style={footLink}>
             (888) 895-4009
           </a>
+          <a
+            href="https://www.bbb.org/us/ca/irvine/profile/timeshare-cancellation/monarch-resolution-1126-1000127827"
+            target="_blank"
+            rel="noreferrer"
+            style={footLink}
+          >
+            BBB Accredited Business — see our profile &amp; reviews
+          </a>
         </div>
         <div>
           <div style={colHead}>Address</div>

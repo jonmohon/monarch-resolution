@@ -2,9 +2,9 @@ import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.jsx";
-import { ROUTES, SITE_ORIGIN } from "./lib/seo.js";
+import { ROUTES, SITEMAP_ROUTES, SITE_ORIGIN } from "./lib/seo.js";
 
-export { SITE_ORIGIN };
+export { SITE_ORIGIN, SITEMAP_ROUTES };
 
 // Vite injects the deploy base (e.g. "/" on Amplify, "/monarch-resolution/" on
 // GitHub Pages) so the prerendered routes match the client router.

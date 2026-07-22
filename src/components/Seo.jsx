@@ -21,6 +21,7 @@ export default function Seo({ path = "/", title, description, image, type = "web
     <Helmet>
       <title>{pageTitle}</title>
       <meta name="description" content={pageDesc} />
+      {meta.noindex && <meta name="robots" content="noindex,nofollow" />}
       <link rel="canonical" href={canonical} />
 
       <meta property="og:type" content={type} />

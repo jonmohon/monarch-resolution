@@ -12,17 +12,26 @@
 //
 // Best-effort: a failure here must never break the actual phone call.
 
-// Fire the Microsoft UET call-click event.
+import { trackGa4Event } from "./analytics.js";
+
+// Static estimated value of a call click (lower than a form lead — it signals
+// intent, not a captured lead). Lets value-based bidding weight the two.
+const CALL_CLICK_VALUE_USD = 40;
+
+// Fire the Microsoft UET call-click event (+ GA4 mirror for cross-checking).
 function fireUetCallClick(pagePath) {
   try {
     window.uetq = window.uetq || [];
     window.uetq.push("event", "call_click", {
       event_category: "call",
       event_label: pagePath,
+      revenue_value: CALL_CLICK_VALUE_USD,
+      currency: "USD",
     });
   } catch {
     /* UET not loaded — non-fatal */
   }
+  trackGa4Event("call_click", { page_path: pagePath, currency: "USD", value: CALL_CLICK_VALUE_USD });
 }
 
 // Call once on app load.

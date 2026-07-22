@@ -93,6 +93,7 @@ export function ParallaxImage({ src, alt = "", strength = 130, biasY = 0, eager 
         src={src}
         alt={alt}
         loading={eager ? "eager" : "lazy"}
+        fetchpriority={eager ? "high" : undefined}
         decoding="async"
         style={{
           position: "absolute",

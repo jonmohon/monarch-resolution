@@ -30,10 +30,11 @@ export default function ProcessPage() {
       <PageHero
         eyebrow="Process"
         title="Your Proven Path to Timeshare Freedom"
-        intro="We specialize in helping timeshare owners escape unwanted contracts. Our extensive experience, exceptional service, and proven process have enabled thousands to regain their freedom."
+        intro="We specialize in helping timeshare owners escape unwanted contracts. Our focused experience, exceptional service, and proven process help owners regain their freedom."
         scrim="linear-gradient(180deg, rgba(5,16,31,0.35) 0%, rgba(5,16,31,0.22) 45%, rgba(5,16,31,0.62) 100%)"
         biasY={10}
         img={clearPathOut}
+        imgAlt="A clear path forward out of timeshare ownership"
       />
       <Section>
         <SectionHead

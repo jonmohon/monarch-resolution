@@ -19,7 +19,7 @@ function Hero() {
   return (
     <section style={{ position: "relative", background: "var(--navy-900)", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0 }}>
-        <ParallaxImage src={heroImg} biasY={0} strength={180} eager imgStyle={{ scale: "1.08" }} />
+        <ParallaxImage src={heroImg} alt="A couple finally free of their unwanted timeshare" biasY={0} strength={180} eager imgStyle={{ scale: "1.08" }} />
         <div
           style={{
             position: "absolute",
@@ -68,7 +68,15 @@ function Hero() {
             <Button variant="primary" size="lg" href="tel:8888954009" iconLeft={<PhoneIcon />}>
               Call Now
             </Button>
-            <Button variant="outline-light" size="lg" onClick={() => navigate("/process")}>
+            <Button
+              variant="outline-light"
+              size="lg"
+              href="/process"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/process");
+              }}
+            >
               See the Process
             </Button>
           </div>
@@ -96,7 +104,7 @@ function TrustStrip() {
             color: "var(--text-on-dark-muted)",
           }}
         >
-          As trusted by owners of
+          We help owners exit timeshares from developers including
         </span>
       </div>
       <div className="marquee">
@@ -153,7 +161,7 @@ function ClearPath() {
       <div className="split-2">
         <Reveal>
           <div className="zoom-frame" style={{ position: "relative", borderRadius: "var(--radius-lg)", overflow: "hidden", height: 420, boxShadow: "var(--shadow-xl)" }}>
-            <ParallaxImage src={clearPath2} strength={90} />
+            <ParallaxImage src={clearPath2} alt="A clear path out of a timeshare contract" strength={90} />
           </div>
         </Reveal>
         <div>
@@ -177,7 +185,15 @@ function ClearPath() {
           >
             "Our mission is simple: help timeshare owners legally end their obligations and regain financial freedom."
           </p>
-          <Button variant="primary" size="lg" onClick={() => navigate("/consultation")}>
+          <Button
+            variant="primary"
+            size="lg"
+            href="/consultation"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/consultation");
+            }}
+          >
             Free Consultation
           </Button>
         </div>
@@ -194,7 +210,7 @@ const SERVICES = [
   },
   {
     t: "Contract Closure",
-    d: "Our legal team efficiently manages the dissolution of your timeshare contract, ensuring a smooth, professional resolution.",
+    d: "Our resolution specialists manage the cancellation of your timeshare contract from start to finish. When a file requires legal work, it is referred to independent licensed attorneys.",
     icon: <SealIcon />,
   },
   {
@@ -210,7 +226,7 @@ function Services() {
       <SectionHead
         eyebrow="Our Services"
         title="What Monarch Resolution does"
-        intro="Timeshare exits are complex. Contracts vary widely, and developers often make the process difficult. With decades of combined experience, we review your contract and build a strategy tailored to your situation."
+        intro="Timeshare exits are complex. Contracts vary widely, and developers often make the process difficult. We review your contract and build a strategy tailored to your situation."
       />
       <div className="grid-3">
         {SERVICES.map((s, i) => (
@@ -280,14 +296,22 @@ function WhoWeHelp() {
             ))}
           </ul>
           <Reveal delay={420} y={18}>
-            <Button variant="secondary" size="lg" onClick={() => navigate("/consultation")}>
+            <Button
+              variant="secondary"
+              size="lg"
+              href="/consultation"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/consultation");
+              }}
+            >
               Get Started
             </Button>
           </Reveal>
         </div>
         <Reveal delay={120}>
           <div className="zoom-frame" style={{ position: "relative", borderRadius: "var(--radius-lg)", overflow: "hidden", height: 440, boxShadow: "var(--shadow-lg)" }}>
-            <ParallaxImage src={focusedImg} biasY={10} strength={80} />
+            <ParallaxImage src={focusedImg} alt="Timeshare owners reviewing their exit options" biasY={10} strength={80} />
           </div>
         </Reveal>
       </div>
@@ -335,7 +359,15 @@ function FinalCTA() {
           Our goal is clarity, transparency, and results — so you can finally close this chapter. Discover how Monarch Resolution can facilitate a
           smooth, affordable exit.
         </p>
-        <Button variant="primary" size="lg" onClick={() => navigate("/consultation")}>
+        <Button
+          variant="primary"
+          size="lg"
+          href="/consultation"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/consultation");
+          }}
+        >
           Get Started
         </Button>
         </Reveal>

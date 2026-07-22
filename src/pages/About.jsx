@@ -256,7 +256,7 @@ function OurPromise() {
             className="zoom-frame"
             style={{ position: "relative", borderRadius: "var(--radius-lg)", overflow: "hidden", height: 460, boxShadow: "var(--shadow-lg)" }}
           >
-            <ParallaxImage src={commitment} strength={85} />
+            <ParallaxImage src={commitment} alt="Advisor working one-on-one with a timeshare owner" strength={85} />
           </div>
         </Reveal>
         <div>
@@ -345,6 +345,7 @@ export default function AboutPage() {
         intro="Monarch Resolution is a founder-led firm built on a simple idea: timeshare owners deserve to work with the person actually handling their file — not a sales floor."
         biasY={10}
         img={aboutHero}
+        imgAlt="The founder-led team at Monarch Resolution"
       />
       <FounderStory />
       <BoutiqueDifference />

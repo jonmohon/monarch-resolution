@@ -36,8 +36,14 @@ export default function ConsultationPage() {
             >
               Start your free exit analysis today
             </h1>
-            <p className="hero-rise hero-rise-2" style={{ fontSize: 19, lineHeight: 1.62, color: "rgba(255,255,255,0.88)", maxWidth: "48ch", margin: "0 0 34px" }}>
+            <p className="hero-rise hero-rise-2" style={{ fontSize: 19, lineHeight: 1.62, color: "rgba(255,255,255,0.88)", maxWidth: "48ch", margin: "0 0 18px" }}>
               Tell us about your timeshare and one of our advisors will reach out within one business day with realistic, no-pressure guidance.
+            </p>
+            <p className="hero-rise hero-rise-2" style={{ fontSize: 17, lineHeight: 1.6, color: "rgba(255,255,255,0.88)", margin: "0 0 34px" }}>
+              Prefer to talk now?{" "}
+              <a href="tel:8888954009" style={{ color: "var(--teal-400)", fontWeight: 700, textDecoration: "none" }}>
+                Call (888) 895-4009
+              </a>
             </p>
             <div className="consult-points">
               {CONSULT_POINTS.map(([t, d], i) => (

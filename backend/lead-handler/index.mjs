@@ -1,5 +1,6 @@
+import { randomUUID } from "node:crypto";
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
-import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, UpdateItemCommand, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 const ses = new SESv2Client({});
 const ddb = new DynamoDBClient({});
@@ -14,6 +15,12 @@ const MIN_FILL_MS = 2500; // humans don't complete this form faster than ~2.5s
 const RECAPTCHA_PROJECT_ID = process.env.RECAPTCHA_PROJECT_ID || "";
 const RECAPTCHA_API_KEY = process.env.RECAPTCHA_API_KEY || "";
 const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || "";
+
+// Durable lead store. EVERY submission (accepted or silently dropped) is
+// persisted here BEFORE any email/webhook is attempted, so a downstream
+// failure or a bot-filter false positive never loses a lead's contact info.
+// Empty table name = disabled.
+const LEADS_TABLE = process.env.LEADS_TABLE || "";
 
 // Per-IP rate limit (DynamoDB fixed-window). Empty table name = disabled.
 const RATELIMIT_TABLE = process.env.RATELIMIT_TABLE || "";
@@ -163,6 +170,7 @@ A new exit-analysis request just came in from <strong>monarchresolution.com</str
   ${row("Mortgage Balance", esc(lead.mortgage))}
   ${row("Heard About Us", esc(lead.source))}
   ${row("Lead Source", esc(lead.lead_source))}
+  ${row("TCPA Consent", lead.consent === true || lead.consent === "true" ? "Yes" : "Not recorded")}
   ${row("Submitted", esc(meta.submittedAt))}
   ${row("Page", esc(meta.page))}
 </table>
@@ -291,6 +299,47 @@ async function rateLimited(ip) {
   }
 }
 
+// Persist the raw submission with its disposition ("accepted" or the
+// silent-drop reason). Fails open — persistence must never block a lead.
+async function persistLead(id, lead, ip, disposition) {
+  if (!LEADS_TABLE) return;
+  const s = (v) => ({ S: String(v ?? "") });
+  try {
+    await ddb.send(
+      new PutItemCommand({
+        TableName: LEADS_TABLE,
+        Item: {
+          id: { S: id },
+          submitted_at: s(new Date().toISOString()),
+          disposition: s(disposition),
+          name: s(lead.name),
+          phone: s(lead.phone),
+          email: s(lead.email),
+          developer: s(lead.developer),
+          fee: s(lead.fee),
+          mortgage: s(lead.mortgage),
+          source: s(lead.source),
+          lead_source: s(lead.lead_source),
+          msclkid: s(lead.msclkid),
+          gclid: s(lead.gclid),
+          fbclid: s(lead.fbclid),
+          utm_source: s(lead.utm_source),
+          utm_campaign: s(lead.utm_campaign),
+          utm_term: s(lead.utm_term),
+          utm_content: s(lead.utm_content),
+          tcpa_consent: s(lead.consent === true || lead.consent === "true" ? "yes" : "no"),
+          page: s(lead.page),
+          ip: s(ip),
+          elapsed_ms: s(lead.elapsedMs),
+          interact_ms: s(lead.interactMs),
+        },
+      })
+    );
+  } catch (e) {
+    console.error("lead persistence error (continuing):", e);
+  }
+}
+
 // True if the submission looks like spam/bot content.
 function looksLikeSpam(lead) {
   const blob = `${lead.name || ""} ${lead.developer || ""} ${lead.source || ""} ${lead.fee || ""} ${lead.mortgage || ""}`;
@@ -329,21 +378,32 @@ export const handler = async (event) => {
   if (missing.length) return respond(400, { error: `Missing: ${missing.join(", ")}` });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(lead.email)) return respond(400, { error: "Invalid email" });
 
+  const leadId = randomUUID();
+  const ip = event.requestContext?.http?.sourceIp || "";
+
   // ── Bot protection ────────────────────────────────────────────────────────
-  // Silent drops (200 ok) so bots get no signal to tune against; the visitor
-  // side just sees the normal success path.
-  const silentDrop = (why) => {
+  // Silent drops (200 ok, no id) so bots get no signal to tune against. The
+  // client gates conversion tracking + the CRM push on the id, so drops never
+  // fire ad conversions. Every drop is still persisted with its reason, so a
+  // false positive is recoverable from the leads table, never lost.
+  const silentDrop = async (why) => {
     console.warn("Dropped suspected bot lead:", why, { email: lead.email, page: lead.page });
+    await persistLead(leadId, lead, ip, `dropped:${why}`);
     return respond(200, { ok: true });
   };
 
   // 1) Honeypot — hidden `company` field; humans never fill it.
   if (String(lead.company || "").trim()) return silentDrop("honeypot");
 
-  // 2) Time-trap — form completed impossibly fast.
+  // 2) Time-trap — form completed impossibly fast. Prefer time-since-first-
+  //    keystroke when the client provides it: autofill-assisted humans can
+  //    legitimately submit fast after a slow read, and measuring from first
+  //    input avoids punishing them for a late form mount.
   const elapsedMs = Number(lead.elapsedMs);
-  if (Number.isFinite(elapsedMs) && elapsedMs >= 0 && elapsedMs < MIN_FILL_MS) {
-    return silentDrop(`too-fast:${elapsedMs}ms`);
+  const interactMs = Number(lead.interactMs);
+  const fillMs = Number.isFinite(interactMs) && interactMs > 0 ? Math.max(elapsedMs, interactMs) : elapsedMs;
+  if (Number.isFinite(fillMs) && fillMs >= 0 && fillMs < MIN_FILL_MS) {
+    return silentDrop(`too-fast:${fillMs}ms`);
   }
 
   // 3) Origin check — a real submit carries our site's Origin/Referer. Reject
@@ -358,7 +418,6 @@ export const handler = async (event) => {
   if (looksLikeSpam(lead)) return silentDrop("spam-content");
 
   // 5) Per-IP rate limit — caps volumetric abuse from a single source.
-  const ip = event.requestContext?.http?.sourceIp || "";
   if (await rateLimited(ip)) return silentDrop(`rate-limit:${ip}`);
 
   // 6) reCAPTCHA Enterprise — self-skips when unconfigured or token missing;
@@ -366,6 +425,10 @@ export const handler = async (event) => {
   if (!(await verifyRecaptcha(String(lead.recaptchaToken || ""), "lead_submit"))) {
     return silentDrop("recaptcha");
   }
+
+  // ── Durable persistence BEFORE any notification attempt ──────────────────
+  // If SES/Discord all fail after this point, the lead is still recoverable.
+  await persistLead(leadId, lead, ip, "accepted");
 
   const meta = {
     submittedAt: new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles", dateStyle: "medium", timeStyle: "short" }) + " PT",
@@ -381,9 +444,12 @@ export const handler = async (event) => {
   const failures = results.filter((r) => r.status === "rejected");
   failures.forEach((f) => console.error("Lead pipeline failure:", f.reason));
 
-  // If the internal notification failed, surface an error so the visitor retries.
+  // If the internal notification failed, surface an error so the visitor
+  // retries — the lead itself is already safe in the leads table.
   if (results[0].status === "rejected") {
     return respond(502, { error: "Could not submit. Please call us at (888) 895-4009." });
   }
-  return respond(200, { ok: true });
+  // The id doubles as the client's accept marker: silent drops return {ok:true}
+  // with no id, and the client only fires conversion tracking when id is present.
+  return respond(200, { ok: true, id: leadId });
 };

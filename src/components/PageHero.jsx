@@ -1,10 +1,13 @@
 import Eyebrow from "../ds/Eyebrow.jsx";
+import Button from "../ds/Button.jsx";
+import { PhoneIcon } from "./icons.jsx";
 import { ParallaxImage } from "./motion.jsx";
 
-export default function PageHero({ eyebrow, title, intro, img, scrim, biasY = 0, minHeight }) {
+export default function PageHero({ eyebrow, title, intro, img, imgAlt = "", scrim, biasY = 0, minHeight }) {
   return (
     <section style={{ position: "relative", background: "var(--navy-900)", overflow: "hidden", minHeight: minHeight || "auto" }}>
-      <ParallaxImage src={img} biasY={biasY} strength={160} imgStyle={{ scale: "1.1" }} />
+      {/* This image is the page's LCP element — load it eagerly. */}
+      <ParallaxImage src={img} alt={imgAlt} biasY={biasY} strength={160} eager imgStyle={{ scale: "1.1" }} />
       <div style={{ position: "absolute", inset: 0, background: scrim || "var(--scrim-hero)", pointerEvents: "none" }} />
       <div className="container" style={{ position: "relative", zIndex: 2, padding: "104px var(--gutter) 88px", textAlign: "center" }}>
         <div className="hero-rise">
@@ -35,6 +38,11 @@ export default function PageHero({ eyebrow, title, intro, img, scrim, biasY = 0,
             {intro}
           </p>
         )}
+        <div className="hero-rise hero-rise-3" style={{ display: "flex", gap: 14, marginTop: 28, justifyContent: "center", flexWrap: "wrap" }}>
+          <Button variant="primary" size="lg" href="tel:8888954009" iconLeft={<PhoneIcon />}>
+            Call (888) 895-4009
+          </Button>
+        </div>
       </div>
     </section>
   );

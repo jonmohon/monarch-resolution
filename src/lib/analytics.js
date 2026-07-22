@@ -45,5 +45,29 @@ function loadGa4(id) {
   }
   window.gtag = gtag;
   gtag("js", new Date());
-  gtag("config", id, { anonymize_ip: true });
+  gtag("config", id);
+}
+
+// SPA pageview — gtag('config') only records the page it was called on, so
+// client-side route changes must be reported explicitly. No-op until consent
+// has loaded GA4.
+export function trackGa4PageView(path) {
+  try {
+    window.gtag?.("event", "page_view", {
+      page_path: path,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  } catch {
+    /* non-fatal */
+  }
+}
+
+// GA4 custom/conversion event. No-op until consent has loaded GA4.
+export function trackGa4Event(name, params = {}) {
+  try {
+    window.gtag?.("event", name, params);
+  } catch {
+    /* non-fatal */
+  }
 }

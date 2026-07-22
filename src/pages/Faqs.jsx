@@ -18,6 +18,7 @@ export default function FaqsPage() {
         intro="Straight answers about timeshare cancellation, costs, and what to expect when you work with Monarch Resolution."
         biasY={10}
         img={whoWeHelp}
+        imgAlt="Timeshare owners getting straight answers about the exit process"
       />
       <Section>
         <Reveal style={{ maxWidth: 860, margin: "0 auto" }}>

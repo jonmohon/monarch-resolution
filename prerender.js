@@ -9,7 +9,7 @@ const DIST = "dist";
 const SERVER_ENTRY = join(process.cwd(), "dist-server", "entry-server.js");
 
 const template = readFileSync(join(DIST, "index.html"), "utf8");
-const { routes, render, SITE_ORIGIN } = await import(pathToFileURL(SERVER_ENTRY).href);
+const { routes, render, SITE_ORIGIN, SITEMAP_ROUTES } = await import(pathToFileURL(SERVER_ENTRY).href);
 
 let count = 0;
 for (const route of routes) {
@@ -33,7 +33,7 @@ console.log(`Prerendered ${count} route(s).`);
 
 // Generate sitemap.xml from the same route list (single source of truth).
 const priority = (r) => (r === "/" ? "1.0" : r === "/consultation" ? "0.9" : "0.7");
-const urls = routes
+const urls = SITEMAP_ROUTES
   .map(
     (r) =>
       `  <url>\n    <loc>${SITE_ORIGIN}${r === "/" ? "/" : r}</loc>\n` +
@@ -42,4 +42,4 @@ const urls = routes
   .join("\n");
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 writeFileSync(join(DIST, "sitemap.xml"), sitemap);
-console.log(`Wrote sitemap.xml (${routes.length} urls).`);
+console.log(`Wrote sitemap.xml (${SITEMAP_ROUTES.length} urls).`);

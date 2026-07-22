@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../ds/Button.jsx";
 import Checkbox from "../ds/Checkbox.jsx";
 import Eyebrow from "../ds/Eyebrow.jsx";
 import Input from "../ds/Input.jsx";
 import Select from "../ds/Select.jsx";
 import { getAttribution } from "../lib/attribution.js";
-import { trackLeadConversion } from "../lib/leadTracking.js";
+import { classifyLeadSource, trackLeadConversion } from "../lib/leadTracking.js";
 import { loadRecaptcha, getRecaptchaToken } from "../lib/recaptcha.js";
 import { RECAPTCHA_SITE_KEY } from "../config.js";
 
@@ -16,17 +16,21 @@ const LEAD_ENDPOINT = "https://wucqsnrg8c.execute-api.us-west-2.amazonaws.com/";
 
 // Compact lead-capture form used in the hero and the consultation page.
 export default function LeadForm({ title = "Request Your Free Exit Analysis", compact = false }) {
+  const navigate = useNavigate();
   const [fields, setFields] = useState({ name: "", phone: "", email: "", developer: "", fee: "", mortgage: "", source: "" });
   const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-  const [sent, setSent] = useState(false);
-  // Bot traps: a hidden honeypot bots auto-fill, and the time the form loaded so
+  // Bot traps: a hidden honeypot bots auto-fill, and load/first-input times so
   // the server can reject submissions completed impossibly fast.
   const [company, setCompany] = useState("");
   const [loadedAt] = useState(() => Date.now());
+  const firstInputAt = useRef(0);
 
-  const set = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
+  const set = (key) => (e) => {
+    if (!firstInputAt.current) firstInputAt.current = Date.now();
+    setFields((f) => ({ ...f, [key]: e.target.value }));
+  };
 
   // Preload reCAPTCHA v3 so the token is ready by the time the user submits.
   useEffect(() => {
@@ -42,7 +46,6 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
       // readable lead_source) to the Lambda so the Discord notification can show
       // "Bing" vs "Website". Pipeline CRM source stays "Nexvato" (set in the Zap).
       const attr = getAttribution();
-      const leadSource = attr.msclkid ? "Bing" : "Website";
       const recaptchaToken = await getRecaptchaToken("lead_submit");
       const res = await fetch(LEAD_ENDPOINT, {
         method: "POST",
@@ -51,73 +54,36 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
           ...fields,
           page: window.location.href,
           msclkid: attr.msclkid || "",
-          lead_source: leadSource,
+          gclid: attr.gclid || "",
+          fbclid: attr.fbclid || "",
+          utm_source: attr.utm_source || "",
+          utm_campaign: attr.utm_campaign || "",
+          utm_term: attr.utm_term || "",
+          utm_content: attr.utm_content || "",
+          lead_source: classifyLeadSource(attr),
+          consent, // TCPA consent checkbox — stored server-side with the lead
           // bot-protection signals (see backend/lead-handler)
           company, // honeypot — must stay empty
-          elapsedMs: Date.now() - loadedAt, // time-trap
+          elapsedMs: Date.now() - loadedAt, // time-trap (since form load)
+          interactMs: firstInputAt.current ? Date.now() - firstInputAt.current : null, // since first keystroke
           recaptchaToken,
         }),
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Something went wrong.");
       }
-      // Lead saved — fire Microsoft UET conversion + push to the Zapier pipeline
-      // (CRM + Sheet). Best-effort; never blocks the thank-you screen.
-      trackLeadConversion(fields);
-      setSent(true);
+      // Only a real accept returns an id; silent bot-drops return a bare
+      // {ok:true}. Gate conversion tracking + the CRM push on the id so
+      // dropped submissions never fire ad conversions or pollute the CRM.
+      if (data.id) trackLeadConversion(fields, consent);
+      // Dedicated confirmation URL — destination-goal trackable, survives reload.
+      navigate("/thank-you");
     } catch (err) {
       setError(err.message === "Failed to fetch" ? "Network error — please try again or call (888) 895-4009." : err.message);
     } finally {
       setSending(false);
     }
-  }
-
-  if (sent) {
-    return (
-      <div style={{ background: "var(--surface-card)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-xl)", padding: 40, textAlign: "center" }}>
-        <div
-          style={{
-            width: 60,
-            height: 60,
-            margin: "0 auto 18px",
-            borderRadius: "50%",
-            background: "var(--teal-100)",
-            display: "grid",
-            placeItems: "center",
-            color: "var(--brand-accent-ink)",
-          }}
-        >
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-        <h3 style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-strong)", margin: "0 0 8px" }}>Thank you.</h3>
-        <p style={{ margin: "0 0 20px", color: "var(--text-body)" }}>
-          An exit advisor will reach out within one business day to explain your realistic options. A confirmation email is on its way to you now.
-        </p>
-        <p style={{ margin: "0 0 10px", fontSize: 14, color: "var(--text-body)" }}>Prefer to talk now? Call us directly:</p>
-        <a
-          href="tel:+18888954009"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "12px 22px",
-            borderRadius: "var(--radius-md, 10px)",
-            background: "var(--brand-accent-ink, #0f766e)",
-            color: "#fff",
-            fontWeight: 600,
-            textDecoration: "none",
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
-          </svg>
-          (888) 895-4009
-        </a>
-      </div>
-    );
   }
 
   return (
@@ -137,8 +103,10 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
         <Eyebrow>Get Your Quote</Eyebrow>
         <h3 style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-strong)", margin: "8px 0 0", lineHeight: 1.15 }}>{title}</h3>
       </div>
-      {/* Honeypot: hidden from humans, bots fill it → server silently drops the lead. */}
-      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: "auto", width: 1, height: 1, overflow: "hidden" }}>
+      {/* Honeypot: hidden from humans, bots fill it → server silently drops the
+          lead. display:none (not offscreen positioning) so browser/password-manager
+          autofill never treats it as a real field and fills it for a human. */}
+      <div aria-hidden="true" style={{ display: "none" }}>
         <label>
           Company
           <input
@@ -188,7 +156,9 @@ export default function LeadForm({ title = "Request Your Free Exit Analysis", co
             <Link to="/privacy" target="_blank">
               Privacy Policy
             </Link>
-            , and consent to be contacted about my inquiry.
+            , and consent to receive calls, text messages, and emails about my inquiry from
+            Monarch Resolution at the number provided, including via automated technology.
+            Consent is not a condition of purchase; message/data rates may apply.
           </>
         }
       />

@@ -6,7 +6,7 @@
 // before the visitor submits the lead form. LeadForm reads it back at submit time
 // to attribute the lead to Microsoft and to drive offline-conversion reporting.
 
-const KEYS = ["msclkid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid"];
+const KEYS = ["msclkid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"];
 const PREFIX = "attr_";
 const TS_KEY = "attr_captured_at";
 // Microsoft's click-attribution window is 90 days. After that, a stored msclkid

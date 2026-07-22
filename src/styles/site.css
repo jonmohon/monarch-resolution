@@ -29,6 +29,7 @@
 .nav-links { display: flex; align-items: center; gap: 30px; }
 .nav-toggle { display: none; }
 .mobile-menu { display: none; }
+.mobile-call-bar { display: none; }
 
 @media (max-width: 960px) {
   .hero-grid, .split-2, .split-2-tight, .about-split, .faq-grid, .consult-grid { grid-template-columns: 1fr; gap: 44px; }
@@ -67,6 +68,50 @@
     color: var(--text-strong);
     padding: 12px 0;
     border-bottom: 1px solid var(--border-subtle);
+  }
+
+  /* Sticky bottom call bar (mobile only). Sits below the consent banner
+     (z-index 100) so consent stays on top until dismissed. */
+  .mobile-call-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: flex;
+    gap: 10px;
+    padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+    background: var(--surface-card);
+    border-top: 1px solid var(--border-subtle);
+    box-shadow: 0 -4px 16px rgba(5, 16, 31, 0.12);
+  }
+  .mobile-call-bar a {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 10px;
+    border-radius: 10px;
+    font-family: var(--font-label);
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .mobile-call-bar-phone {
+    background: var(--teal-500);
+    color: #fff;
+  }
+  .mobile-call-bar-cta {
+    background: var(--surface-alt, #f0f3f7);
+    color: var(--text-strong);
+    border: 1px solid var(--border-subtle);
+  }
+  /* Keep page content clear of the fixed bar. */
+  body {
+    padding-bottom: 66px;
   }
 }
 
