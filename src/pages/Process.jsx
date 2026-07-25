@@ -5,21 +5,26 @@ import { Section, SectionHead } from "../components/Section.jsx";
 import Seo from "../components/Seo.jsx";
 import clearPathOut from "../assets/clear-path-out.webp";
 
-const TITLE_STEPS = [
+const EXIT_STEPS = [
   {
     n: 1,
-    t: "Initial Consultation & Analysis",
-    d: "Your journey begins with a call with a friendly exit advisor. We gather essential information about your contract and assess whether your file can lead to a successful resolution. Each situation is unique, so your advisor crafts a customized exit strategy tailored to your circumstances.",
+    t: "Free Consultation & Case Review",
+    d: "Your journey begins with a call with a friendly exit advisor. We gather essential information about your contract and assess whether your file can lead to a successful resolution. Each situation is unique, so your advisor crafts a customized exit strategy tailored to your circumstances — and if we don't believe we can help, we tell you that up front.",
   },
   {
     n: 2,
-    t: "Seamless Client Integration",
-    d: "After acceptance and completed agreements, you'll receive a welcome call from our Client Services team, who help you gather required documentation. They remain your primary contact, guiding you through each step toward resolution.",
+    t: "Onboarding & Documentation",
+    d: "After acceptance and completed agreements, you'll receive a welcome call from our Client Services team, who help you assemble the file: your contract and deed, financing documents, and anything you kept from the sales presentation. Evidence drives every option, so this step matters. Client Services remains your primary contact from here on.",
   },
   {
     n: 3,
-    t: "Resolution & Celebration",
-    d: "The final step is the best one — it's time to celebrate. After meticulous work, you achieve “Club Freedom” status with a successfully resolved timeshare. Welcome to your new, timeshare-free life.",
+    t: "Legal Review & Advocacy",
+    d: "This is where the work happens. Your documents go through attorney-led review of the contract and the circumstances of the sale, and from that point forward we communicate with the developer on your behalf — you no longer have to field those calls yourself. This is the longest phase, and its length depends on your contract and how the developer responds.",
+  },
+  {
+    n: 4,
+    t: "Resolution & Release",
+    d: "Your obligation to the timeshare ends, and you receive documentation confirming it. If the situation affected your credit along the way, we can help you address that as part of wrapping up your file. Welcome to your new, timeshare-free life.",
   },
 ];
 
@@ -39,11 +44,11 @@ export default function ProcessPage() {
       <Section>
         <SectionHead
           eyebrow="Setting Clear Expectations"
-          title="The title transfer process, step by step"
+          title="The cancellation process, step by step"
           intro="While our services come with a fee and we can't guarantee specific outcomes, our process gives every client a clear, supported route forward."
         />
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {TITLE_STEPS.map((s, i) => (
+          {EXIT_STEPS.map((s, i) => (
             <Reveal key={s.n} delay={i * 120}>
             <div className="step-card">
               <div style={{ fontFamily: "var(--font-display)", fontSize: 64, fontWeight: 600, color: "var(--brand-prestige)", lineHeight: 0.9, minWidth: 78 }}>
