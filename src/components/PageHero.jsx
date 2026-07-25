@@ -11,7 +11,7 @@ export default function PageHero({ eyebrow, title, intro, img, imgAlt = "", scri
       <div style={{ position: "absolute", inset: 0, background: scrim || "var(--scrim-hero)", pointerEvents: "none" }} />
       <div className="container" style={{ position: "relative", zIndex: 2, padding: "104px var(--gutter) 88px", textAlign: "center" }}>
         <div className="hero-rise">
-          <Eyebrow onDark align="center">
+          <Eyebrow onImage align="center">
             {eyebrow}
           </Eyebrow>
         </div>

@@ -22,6 +22,10 @@
   --teal-400: #40a3e6;
   --teal-100: #d6eafa;
 
+  /* Eyebrow color for text set over photography. teal-400 measures ~2.6:1 on the
+     hero images (AA needs 4.5:1 at this size); this tint keeps the brand cast. */
+  --eyebrow-on-image: #eaf4fd;
+
   /* --- Brass / gold --- */
   --gold-700: #9c7c3c;
   --gold-500: #c6a15b;

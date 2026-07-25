@@ -24,7 +24,7 @@ function Hero() {
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(95deg, rgba(5,16,31,0.38) 0%, rgba(5,16,31,0.24) 50%, rgba(5,16,31,0.14) 100%)",
+            background: "linear-gradient(95deg, rgba(5,16,31,0.62) 0%, rgba(5,16,31,0.38) 50%, rgba(5,16,31,0.18) 100%)",
             pointerEvents: "none",
           }}
         />
@@ -32,7 +32,7 @@ function Hero() {
       <div className="container hero-grid" style={{ position: "relative", zIndex: 2, padding: "96px var(--gutter)" }}>
         <div>
           <div className="hero-rise">
-            <Eyebrow onDark withRule>
+            <Eyebrow onImage withRule>
               Timeshare Exit Experts
             </Eyebrow>
           </div>

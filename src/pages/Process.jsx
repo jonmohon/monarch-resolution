@@ -36,7 +36,7 @@ export default function ProcessPage() {
         eyebrow="Process"
         title="Your Proven Path to Timeshare Freedom"
         intro="We specialize in helping timeshare owners escape unwanted contracts. Our focused experience, exceptional service, and proven process help owners regain their freedom."
-        scrim="linear-gradient(180deg, rgba(5,16,31,0.35) 0%, rgba(5,16,31,0.22) 45%, rgba(5,16,31,0.62) 100%)"
+        scrim="linear-gradient(180deg, rgba(5,16,31,0.58) 0%, rgba(5,16,31,0.34) 45%, rgba(5,16,31,0.68) 100%)"
         biasY={10}
         img={clearPathOut}
         imgAlt="A clear path forward out of timeshare ownership"
