@@ -93,6 +93,18 @@ export default function Footer() {
           </Link>
         </span>
       </div>
+      <div className="container" style={{ marginTop: 12 }}>
+        <span style={{ fontSize: 13, color: "var(--text-on-dark-muted)" }}>
+          <a
+            href="https://www.nexvato.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--text-on-dark-muted)" }}
+          >
+            Powered by Nexvato
+          </a>
+        </span>
+      </div>
     </footer>
   );
 }
