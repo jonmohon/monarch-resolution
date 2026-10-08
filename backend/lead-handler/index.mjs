@@ -27,6 +27,20 @@ const RATELIMIT_TABLE = process.env.RATELIMIT_TABLE || "";
 const RL_WINDOW_S = 600; // 10-minute window
 const RL_MAX = 6; // accepted submissions per IP per window before silent-drop
 
+// Tor exit-node block. The Oct 2026 bot wave (60+ submissions, gibberish names,
+// stolen emails) arrived 100% via Tor exits; no real lead ever has. The list is
+// cached per container and refreshed hourly; a stale list is reused on fetch
+// failure, and no list at all fails open.
+const TOR_LIST_URL = "https://check.torproject.org/torbulkexitlist";
+const TOR_TTL_MS = 60 * 60 * 1000;
+let torCache = { ips: null, at: 0 };
+
+// Global cap on the customer auto-reply. The form emails whatever address it is
+// given, which makes it useful for "subscription bombing" (flooding a stolen
+// address with real confirmation emails). Leads are still stored and still
+// reach Monarch past the cap; only the customer email is skipped.
+const AUTOREPLY_MAX_PER_HOUR = 10;
+
 const SITE = "https://monarchresolution.com";
 const LOGO_WHITE = `${SITE}/email/monarch-logo-white.png`;
 const PHONE_DISPLAY = "(888) 895-4009";
@@ -248,29 +262,74 @@ async function postDiscord(lead, meta) {
   if (!res.ok) throw new Error(`Discord webhook failed: ${res.status}`);
 }
 
-// Verify a reCAPTCHA Enterprise token by creating an assessment. Returns false
-// only on a *confirmed* bad token (invalid, wrong action, or low score). Fails
-// OPEN when unconfigured, when no token is present, or on a network error, so a
-// misconfig or Google outage never blocks real leads.
+// Verify a reCAPTCHA Enterprise token by creating an assessment. Returns
+// { ok, note }: ok is false only on a *confirmed* bad token (invalid, wrong
+// action, or low score). Fails OPEN when unconfigured, when no token is present,
+// or when the assessment call itself errors (bad key, quota, outage), so a
+// misconfig or Google outage never blocks real leads. `note` is persisted with
+// the lead so token presence and scores can be audited.
 async function verifyRecaptcha(token, action = "lead_submit") {
-  if (!token) return true; // no token → rely on the other layers
-  if (!(RECAPTCHA_PROJECT_ID && RECAPTCHA_API_KEY && RECAPTCHA_SITE_KEY)) return true; // not configured yet
+  if (!token) return { ok: true, note: "no-token" };
+  if (!(RECAPTCHA_PROJECT_ID && RECAPTCHA_API_KEY && RECAPTCHA_SITE_KEY)) return { ok: true, note: "unconfigured" };
   try {
     const url = `https://recaptchaenterprise.googleapis.com/v1/projects/${RECAPTCHA_PROJECT_ID}/assessments?key=${RECAPTCHA_API_KEY}`;
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event: { token, siteKey: RECAPTCHA_SITE_KEY, expectedAction: action } }),
+      signal: AbortSignal.timeout(5000),
     });
     const data = await res.json();
-    if (!data?.tokenProperties?.valid) return false;
-    if (data.tokenProperties.action && data.tokenProperties.action !== action) return false;
+    if (!res.ok || data?.error || !data?.tokenProperties) {
+      console.error("reCAPTCHA assessment failed (failing open):", res.status, data?.error);
+      return { ok: true, note: `api-error:${res.status}` };
+    }
+    if (!data.tokenProperties.valid) return { ok: false, note: `invalid:${data.tokenProperties.invalidReason}` };
+    if (data.tokenProperties.action && data.tokenProperties.action !== action) {
+      return { ok: false, note: `wrong-action:${data.tokenProperties.action}` };
+    }
     const score = data?.riskAnalysis?.score;
-    if (typeof score === "number" && score < 0.5) return false;
-    return true;
+    if (typeof score === "number" && score < 0.5) return { ok: false, note: `score:${score}` };
+    return { ok: true, note: `score:${score}` };
   } catch (e) {
     console.error("reCAPTCHA assessment error (failing open):", e);
-    return true;
+    return { ok: true, note: "api-error:exception" };
+  }
+}
+
+// True for a 10-digit (or 1 + 10-digit) number that breaks North American
+// numbering rules: area code or exchange starting with 0/1, N9X area codes,
+// or N11 service codes. Other lengths are left to the existing checks so
+// international numbers aren't rejected here.
+function invalidNanpPhone(phone) {
+  let d = String(phone || "").replace(/\D/g, "");
+  if (d.length === 11 && d[0] === "1") d = d.slice(1);
+  if (d.length !== 10) return false;
+  const area = d.slice(0, 3);
+  const exch = d.slice(3, 6);
+  return !/[2-9]/.test(area[0]) || area[1] === "9" || area.slice(1) === "11" || !/[2-9]/.test(exch[0]) || exch.slice(1) === "11";
+}
+
+// True once more than AUTOREPLY_MAX_PER_HOUR customer emails have gone out in
+// the current hour. Shares the rate-limit table; fails open (sends) on error.
+async function autoReplyCapped() {
+  if (!RATELIMIT_TABLE) return false;
+  const hour = Math.floor(Date.now() / 3_600_000);
+  try {
+    const res = await ddb.send(
+      new UpdateItemCommand({
+        TableName: RATELIMIT_TABLE,
+        Key: { pk: { S: `autoreply:${hour}` } },
+        UpdateExpression: "SET #t = if_not_exists(#t, :ttl) ADD #c :one",
+        ExpressionAttributeNames: { "#t": "ttl", "#c": "count" },
+        ExpressionAttributeValues: { ":ttl": { N: String((hour + 2) * 3600) }, ":one": { N: "1" } },
+        ReturnValues: "UPDATED_NEW",
+      })
+    );
+    return Number(res.Attributes?.count?.N || "0") > AUTOREPLY_MAX_PER_HOUR;
+  } catch (e) {
+    console.error("auto-reply cap check error (sending anyway):", e);
+    return false;
   }
 }
 
@@ -299,9 +358,25 @@ async function rateLimited(ip) {
   }
 }
 
+async function isTorExit(ip) {
+  if (!ip) return false;
+  if (!torCache.ips || Date.now() - torCache.at > TOR_TTL_MS) {
+    try {
+      const res = await fetch(TOR_LIST_URL, { signal: AbortSignal.timeout(2500) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const ips = new Set((await res.text()).split(/\s+/).filter((s) => /^[0-9a-f.:]+$/i.test(s)));
+      if (ips.size < 100) throw new Error(`suspiciously short list (${ips.size})`);
+      torCache = { ips, at: Date.now() };
+    } catch (e) {
+      console.error("Tor exit list fetch error (using cached list or failing open):", e);
+    }
+  }
+  return torCache.ips ? torCache.ips.has(ip) : false;
+}
+
 // Persist the raw submission with its disposition ("accepted" or the
 // silent-drop reason). Fails open — persistence must never block a lead.
-async function persistLead(id, lead, ip, disposition) {
+async function persistLead(id, lead, ip, disposition, recaptcha = "") {
   if (!LEADS_TABLE) return;
   const s = (v) => ({ S: String(v ?? "") });
   try {
@@ -332,6 +407,8 @@ async function persistLead(id, lead, ip, disposition) {
           ip: s(ip),
           elapsed_ms: s(lead.elapsedMs),
           interact_ms: s(lead.interactMs),
+          recaptcha: s(recaptcha),
+          recaptcha_token_sent: s(lead.recaptchaToken ? "yes" : "no"),
         },
       })
     );
@@ -386,9 +463,9 @@ export const handler = async (event) => {
   // client gates conversion tracking + the CRM push on the id, so drops never
   // fire ad conversions. Every drop is still persisted with its reason, so a
   // false positive is recoverable from the leads table, never lost.
-  const silentDrop = async (why) => {
+  const silentDrop = async (why, recaptchaNote = "") => {
     console.warn("Dropped suspected bot lead:", why, { email: lead.email, page: lead.page });
-    await persistLead(leadId, lead, ip, `dropped:${why}`);
+    await persistLead(leadId, lead, ip, `dropped:${why}`, recaptchaNote);
     return respond(200, { ok: true });
   };
 
@@ -417,27 +494,35 @@ export const handler = async (event) => {
   // 4) Content heuristics — links/spam keywords, absurd lengths, junk phone.
   if (looksLikeSpam(lead)) return silentDrop("spam-content");
 
+  // 4b) Phone that can't exist under North American numbering rules.
+  if (invalidNanpPhone(lead.phone)) return silentDrop("bad-phone");
+
+  // 4c) Tor exit node — see TOR_LIST_URL above.
+  if (await isTorExit(ip)) return silentDrop("tor-exit");
+
   // 5) Per-IP rate limit — caps volumetric abuse from a single source.
   if (await rateLimited(ip)) return silentDrop(`rate-limit:${ip}`);
 
   // 6) reCAPTCHA Enterprise — self-skips when unconfigured or token missing;
   //    fails open on Google outages. Drops only a confirmed bad/low-score token.
-  if (!(await verifyRecaptcha(String(lead.recaptchaToken || ""), "lead_submit"))) {
-    return silentDrop("recaptcha");
-  }
+  const captcha = await verifyRecaptcha(String(lead.recaptchaToken || ""), "lead_submit");
+  if (!captcha.ok) return silentDrop("recaptcha", captcha.note);
 
   // ── Durable persistence BEFORE any notification attempt ──────────────────
   // If SES/Discord all fail after this point, the lead is still recoverable.
-  await persistLead(leadId, lead, ip, "accepted");
+  await persistLead(leadId, lead, ip, "accepted", captcha.note);
 
   const meta = {
     submittedAt: new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles", dateStyle: "medium", timeStyle: "short" }) + " PT",
     page: lead.page || "",
   };
 
+  const skipAutoReply = await autoReplyCapped();
+  if (skipAutoReply) console.warn("Auto-reply cap reached; skipping customer email for", lead.email);
+
   const results = await Promise.allSettled([
     sendEmail(TO_INTERNAL, internalEmail(lead, meta), lead.email),
-    sendEmail(lead.email, customerEmail(lead)),
+    skipAutoReply ? Promise.resolve() : sendEmail(lead.email, customerEmail(lead)),
     postDiscord(lead, meta),
   ]);
 
