@@ -12,6 +12,7 @@ import ConsultationPage from "./pages/Consultation.jsx";
 import PrivacyPage from "./pages/Privacy.jsx";
 import TermsPage from "./pages/Terms.jsx";
 import ThankYouPage from "./pages/ThankYou.jsx";
+import BlackFridayPage from "./pages/BlackFriday.jsx";
 import ConsentBanner from "./site/ConsentBanner.jsx";
 import MobileCallBar from "./site/MobileCallBar.jsx";
 import { ORGANIZATION_JSONLD, SERVICE_JSONLD, WEBSITE_JSONLD } from "./lib/seo.js";
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
+          <Route path="/black-friday" element={<BlackFridayPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>

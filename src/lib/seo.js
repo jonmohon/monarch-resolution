@@ -41,6 +41,13 @@ export const ROUTE_META = {
     title: "Terms of Service | Monarch Resolution",
     description: "The terms that govern your use of the Monarch Resolution website and services.",
   },
+  "/black-friday": {
+    title: "Black Friday: 20% Off Your Timeshare Exit | Monarch Resolution",
+    description:
+      "Book a free timeshare exit consultation by Monday, November 30 and get 20% off Monarch Resolution's service fee when you move forward.",
+    // Campaign page for the Black Friday emails: prerendered, kept out of search.
+    noindex: true,
+  },
   "/thank-you": {
     title: "Request Received | Monarch Resolution",
     description: "Your free exit-analysis request is in. An advisor will reach out within one business day.",
