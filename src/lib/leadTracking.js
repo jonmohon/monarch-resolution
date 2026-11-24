@@ -88,9 +88,12 @@ export function sendLeadToPipeline(fields, consent) {
   }
 }
 
-// Convenience: fire all three on a confirmed (server-accepted) submit.
+// Fire the ad conversions on a confirmed (server-accepted) submit. Since 2026-11-24 the lead
+// reaches Pipeline CRM from the lead Lambda itself (owned by Stella, backend/lead-handler), so
+// the browser no longer posts to the Zapier hook; sendLeadToPipeline is kept only for reference.
+// eslint-disable-next-line no-unused-vars
 export function trackLeadConversion(fields, consent) {
   fireUetLeadConversion();
   trackGa4Event("generate_lead", { currency: "USD", value: LEAD_VALUE_USD });
-  return sendLeadToPipeline(fields, consent);
+  return Promise.resolve();
 }

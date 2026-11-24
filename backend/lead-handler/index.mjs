@@ -10,6 +10,22 @@ const TO_INTERNAL = process.env.TO_INTERNAL || "info@monarchresolution.com";
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
 const MIN_FILL_MS = 2500; // humans don't complete this form faster than ~2.5s
 
+// Pipeline CRM (2026-11-24): accepted leads go straight to Pipeline from here, owned by
+// Stella Cruz, instead of the browser's fire-and-forget Zapier hook (which ad blockers and
+// closed tabs could silently drop). Same API and fields as the Facebook lead sync
+// (monarch-fb-lead-sync). Empty key = disabled.
+const PIPELINE = "https://api.pipelinecrm.com/api/v3";
+const PIPELINE_API_KEY = process.env.PIPELINE_API_KEY || "";
+const PIPELINE_OWNER_ID = Number(process.env.PIPELINE_OWNER_ID || "843110"); // Stella Cruz
+// Lead source by ad platform (classifyLeadSource on the site): Bing, Meta -> Facebook, else Website.
+const PIPELINE_SOURCES = { Bing: 3626172, Meta: 3624089, Website: 3538421 };
+const PIPELINE_CF = {
+  timeshare: "custom_label_3929167", // Name of Timeshare
+  mortgage: "custom_label_3929168", // Mortgage Balance
+  fees: "custom_label_3929169", // Maintenance fees
+  leadId: "custom_label_4000608", // Lead ID
+};
+
 // reCAPTCHA Enterprise (assessment API). All three must be set to enforce;
 // otherwise verification is skipped (form still protected by the other layers).
 const RECAPTCHA_PROJECT_ID = process.env.RECAPTCHA_PROJECT_ID || "";
@@ -417,6 +433,81 @@ async function persistLead(id, lead, ip, disposition, recaptcha = "") {
   }
 }
 
+// ---- Pipeline CRM ---------------------------------------------------------------
+async function pipelineFetch(path, init = {}) {
+  const res = await fetch(`${PIPELINE}/${path}`, {
+    ...init,
+    headers: { Authorization: `Bearer ${PIPELINE_API_KEY}`, "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(8000),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Pipeline ${path} ${res.status}: ${text.slice(0, 300)}`);
+  return text ? JSON.parse(text) : {};
+}
+const escapeHtml = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+// Create (or reuse, by email) the Pipeline person for an accepted lead, owned by Stella, and
+// add a note with everything the form collected. A returning owner keeps their record and
+// current owner; the note says they came back. Returns the person id.
+async function syncLeadToPipeline(lead, leadId, meta) {
+  if (!PIPELINE_API_KEY) return null;
+  const email = String(lead.email || "").trim();
+  const found = await pipelineFetch(`people.json?${new URLSearchParams({ per_page: "5", "conditions[person_email]": email })}`, { method: "GET" });
+  const existing = (found.entries || [])[0] || null;
+  const parts = String(lead.name || "").trim().split(/\s+/);
+  const firstName = parts.shift() || "";
+  const lastName = parts.join(" ");
+  let personId = existing?.id;
+  if (!personId) {
+    const created = await pipelineFetch("people.json", {
+      method: "POST",
+      body: JSON.stringify({
+        person: {
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          phone: lead.phone || "",
+          mobile: lead.phone || "",
+          type: "Contact",
+          lead_source_id: PIPELINE_SOURCES[lead.lead_source] || PIPELINE_SOURCES.Website,
+          user_id: PIPELINE_OWNER_ID,
+          custom_fields: {
+            [PIPELINE_CF.timeshare]: lead.developer || "",
+            [PIPELINE_CF.mortgage]: lead.mortgage || "",
+            [PIPELINE_CF.fees]: lead.fee || "",
+            [PIPELINE_CF.leadId]: leadId,
+          },
+        },
+      }),
+    });
+    personId = created.id;
+  }
+  const lines = [
+    existing ? "Returning lead: submitted the website form again." : "Website form lead.",
+    `Submitted: ${meta.submittedAt}`,
+    `Page: ${lead.page || ""}`,
+    `Timeshare: ${lead.developer || ""}`,
+    `Maintenance fee: ${lead.fee || ""}`,
+    `Mortgage balance: ${lead.mortgage || ""}`,
+    `How they heard: ${lead.source || ""}`,
+    `Ad source: ${lead.lead_source || "Website"}${lead.utm_campaign ? ` (campaign ${lead.utm_campaign})` : ""}`,
+    `Consent to contact: ${lead.consent === true || lead.consent === "true" ? "yes" : "no"}`,
+  ];
+  // Pipeline renders notes as HTML, so plain newlines would collapse into one line.
+  await pipelineFetch("notes.json", { method: "POST", body: JSON.stringify({ note: { person_id: personId, content: `<p>${lines.map(escapeHtml).join("<br>")}</p>` } }) })
+    .catch((e) => console.error("Pipeline note failed:", e.message));
+  if (LEADS_TABLE) {
+    await ddb.send(new UpdateItemCommand({
+      TableName: LEADS_TABLE,
+      Key: { id: { S: leadId } },
+      UpdateExpression: "SET pipeline_person_id = :p, pipeline_existing = :e",
+      ExpressionAttributeValues: { ":p": { S: String(personId) }, ":e": { BOOL: Boolean(existing) } },
+    })).catch((e) => console.error("Pipeline id not saved:", e.message));
+  }
+  console.log(`Lead ${leadId} -> Pipeline person ${personId}${existing ? " (existing)" : ""}`);
+  return personId;
+}
+
 // True if the submission looks like spam/bot content.
 function looksLikeSpam(lead) {
   const blob = `${lead.name || ""} ${lead.developer || ""} ${lead.source || ""} ${lead.fee || ""} ${lead.mortgage || ""}`;
@@ -524,6 +615,7 @@ export const handler = async (event) => {
     sendEmail(TO_INTERNAL, internalEmail(lead, meta), lead.email),
     skipAutoReply ? Promise.resolve() : sendEmail(lead.email, customerEmail(lead)),
     postDiscord(lead, meta),
+    syncLeadToPipeline(lead, leadId, meta),
   ]);
 
   const failures = results.filter((r) => r.status === "rejected");
