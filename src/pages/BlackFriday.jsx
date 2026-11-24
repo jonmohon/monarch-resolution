@@ -72,7 +72,7 @@ function Countdown({ now }) {
 const STEPS = [
   ["Book your free consultation", "Fill out the form or call us. It's free, and you don't have to decide anything on the call."],
   ["We review your timeshare", "An advisor looks at your contract and developer and walks you through your realistic options."],
-  ["Your 20% comes off", "If you decide to move forward, the discount goes right on your written service agreement."],
+  ["Sign by November 30", "If you decide to move forward, sign your service agreement by 11:59 PM Pacific on Monday, November 30 and the 20% comes right off."],
 ];
 
 const TRUST = [
@@ -82,8 +82,8 @@ const TRUST = [
 ];
 
 const OFFER_FAQS = [
-  { q: "Who gets the 20% off?", a: "New clients who book a consultation by 11:59 PM Pacific on Monday, November 30, 2026, and then sign a service agreement with Monarch." },
-  { q: "Do I have to decide on the call?", a: "No. The consultation is free and there's no obligation. Booking before the deadline is what locks in the discount; you can take time to decide after that." },
+  { q: "Who gets the 20% off?", a: "New clients who sign a service agreement with Monarch by 11:59 PM Pacific on Monday, November 30, 2026. Start with a free consultation so there's time to review your options before the deadline." },
+  { q: "Do I have to decide on the call?", a: "No. The consultation is free and there's no obligation. The discount applies when you sign your service agreement by the deadline, so book early to give yourself time to decide." },
   { q: `When do I need to sign?`, a: `To keep the discount, sign your service agreement by ${SIGN_BY}.` },
   { q: "Can I combine it with other offers?", a: "No. The Black Friday discount can't be combined with other offers." },
   { q: "Can you guarantee my timeshare will be cancelled?", a: "Every situation is different, and nobody can honestly guarantee a particular outcome or timeline. What we can promise is a clear plan, everything in writing, and real support from start to finish." },
@@ -124,7 +124,7 @@ export default function BlackFridayPage() {
                 </h1>
                 <p className="hero-rise hero-rise-2" style={{ fontSize: 19, lineHeight: 1.62, color: "rgba(255,255,255,0.9)", maxWidth: "46ch", margin: "0 0 26px" }}>
                   {phase === "last-day" ? <strong style={{ color: "#fff" }}>Ends tonight at 11:59 PM Pacific. </strong> : null}
-                  Book a free consultation by Monday, November 30 and get <strong style={{ color: "#fff" }}>20% off our service fee</strong> when you start your exit with Monarch.
+                  Sign with Monarch by Monday, November 30 and get <strong style={{ color: "#fff" }}>20% off our service fee</strong>. It starts with a free consultation.
                 </p>
                 {now !== null && <div className="hero-rise hero-rise-2"><Countdown now={now} /></div>}
               </>
@@ -182,7 +182,7 @@ export default function BlackFridayPage() {
           <Reveal style={{ maxWidth: 860, margin: "0 auto" }}>
             <Accordion items={OFFER_FAQS} />
             <p style={{ margin: "28px 0 0", fontSize: 13.5, lineHeight: 1.6, color: "var(--text-muted)" }}>
-              Offer: 20% off Monarch Resolution's standard service fee for new clients who book a consultation and sign a service agreement by {SIGN_BY}. Cannot be combined with other offers. Every situation is different, and we can't guarantee a particular outcome or timeline. Your written service agreement explains fees, scope and refund terms before you pay anything.
+              Offer: 20% off Monarch Resolution's standard service fee for new clients who sign a service agreement by {SIGN_BY}. Cannot be combined with other offers. Every situation is different, and we can't guarantee a particular outcome or timeline. Your written service agreement explains fees, scope and refund terms before you pay anything.
             </p>
           </Reveal>
         </Section>
@@ -195,7 +195,7 @@ export default function BlackFridayPage() {
             {ended ? "Ready for a timeshare-free future?" : "Every year you wait is another year of fees"}
           </h2>
           <p style={{ maxWidth: "52ch", margin: "0 auto 30px", fontSize: 18, color: "var(--text-on-dark-muted)", lineHeight: 1.6 }}>
-            {ended ? "Book a free, no-obligation consultation and get a clear plan for your timeshare." : "Book your free consultation before 11:59 PM Pacific on Monday to lock in 20% off our service fee."}
+            {ended ? "Book a free, no-obligation consultation and get a clear plan for your timeshare." : "Book your free consultation now, then sign by 11:59 PM Pacific on Monday to lock in 20% off our service fee."}
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <Button variant="primary" size="lg" onClick={scrollToForm}>{ended ? "Get my free consultation" : "Claim my 20% off"}</Button>
