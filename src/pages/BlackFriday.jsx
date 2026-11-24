@@ -20,7 +20,7 @@ const DEADLINE = Date.parse("2026-12-01T07:59:59Z");
 const BLACK_FRIDAY = Date.parse("2026-11-27T08:00:00Z"); // midnight Pacific, Fri Nov 27
 const LAST_DAY = Date.parse("2026-11-30T08:00:00Z"); // midnight Pacific, Mon Nov 30
 // Confirmed by Monarch before launch: the date the service agreement must be signed by.
-const SIGN_BY = "[sign-by date]";
+const SIGN_BY = "11:59 PM Pacific on November 30, 2026";
 
 function phaseAt(now) {
   if (now > DEADLINE) return "ended";
@@ -182,7 +182,7 @@ export default function BlackFridayPage() {
           <Reveal style={{ maxWidth: 860, margin: "0 auto" }}>
             <Accordion items={OFFER_FAQS} />
             <p style={{ margin: "28px 0 0", fontSize: 13.5, lineHeight: 1.6, color: "var(--text-muted)" }}>
-              Offer: 20% off Monarch Resolution's standard service fee for new clients who book a consultation by 11:59 PM Pacific on November 30, 2026 and sign a service agreement by {SIGN_BY}. Cannot be combined with other offers. Every situation is different, and we can't guarantee a particular outcome or timeline. Your written service agreement explains fees, scope and refund terms before you pay anything.
+              Offer: 20% off Monarch Resolution's standard service fee for new clients who book a consultation and sign a service agreement by {SIGN_BY}. Cannot be combined with other offers. Every situation is different, and we can't guarantee a particular outcome or timeline. Your written service agreement explains fees, scope and refund terms before you pay anything.
             </p>
           </Reveal>
         </Section>
