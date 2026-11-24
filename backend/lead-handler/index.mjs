@@ -17,8 +17,9 @@ const MIN_FILL_MS = 2500; // humans don't complete this form faster than ~2.5s
 const PIPELINE = "https://api.pipelinecrm.com/api/v3";
 const PIPELINE_API_KEY = process.env.PIPELINE_API_KEY || "";
 const PIPELINE_OWNER_ID = Number(process.env.PIPELINE_OWNER_ID || "843110"); // Stella Cruz
-// Lead source by ad platform (classifyLeadSource on the site): Bing, Meta -> Facebook, else Website.
-const PIPELINE_SOURCES = { Bing: 3626172, Meta: 3624089, Website: 3538421 };
+// Every website form lead is source "Nexvato" in Pipeline (as the Facebook leads are); the ad
+// platform (Bing, Meta, Google, Website) goes in the note instead.
+const PIPELINE_LEAD_SOURCE_ID = Number(process.env.PIPELINE_LEAD_SOURCE_ID || "3624439"); // "Nexvato"
 const PIPELINE_CF = {
   timeshare: "custom_label_3929167", // Name of Timeshare
   mortgage: "custom_label_3929168", // Mortgage Balance
@@ -469,7 +470,7 @@ async function syncLeadToPipeline(lead, leadId, meta) {
           phone: lead.phone || "",
           mobile: lead.phone || "",
           type: "Contact",
-          lead_source_id: PIPELINE_SOURCES[lead.lead_source] || PIPELINE_SOURCES.Website,
+          lead_source_id: PIPELINE_LEAD_SOURCE_ID,
           user_id: PIPELINE_OWNER_ID,
           custom_fields: {
             [PIPELINE_CF.timeshare]: lead.developer || "",
